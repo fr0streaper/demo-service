@@ -2,6 +2,7 @@ package com.itmo.microservices.demo.users.api.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.security.core.userdetails.User
+import java.util.*;
 import org.springframework.security.core.userdetails.UserDetails
 
 data class AppUserModel(

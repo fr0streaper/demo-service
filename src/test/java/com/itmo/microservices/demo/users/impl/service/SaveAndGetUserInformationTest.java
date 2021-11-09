@@ -14,6 +14,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.UUID;
+
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 @SuppressWarnings("UnstableApiUsage")
@@ -42,6 +44,7 @@ public class SaveAndGetUserInformationTest {
                 "email",
                 "password"
         );
+        appUser.setId(UUID.randomUUID());
 
         when(repository.findByUsername("username")).thenReturn(appUser);
         when(repository.save(any())).thenReturn(appUser);
@@ -57,6 +60,7 @@ public class SaveAndGetUserInformationTest {
     public void registerTest() {
         userService.registerUser(request);
         AppUserModel user = new AppUserModel(
+                appUser.getId(),
                 "username",
                 "name",
                 "surname",
@@ -72,6 +76,7 @@ public class SaveAndGetUserInformationTest {
     @org.junit.Test
     public void findUserTest() {
         AppUserModel user = new AppUserModel(
+                appUser.getId(),
                 "username",
                 "name",
                 "surname",
