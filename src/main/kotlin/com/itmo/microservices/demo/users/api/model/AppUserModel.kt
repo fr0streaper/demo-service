@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
 
 data class AppUserModel(
+        val id: UUID,
         val username: String,
         val name: String,
         val surname: String,
