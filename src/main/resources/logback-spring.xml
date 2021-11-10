@@ -9,7 +9,7 @@
 
         <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
             <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-                <level>DEBUG</level>
+                <level>TRACE</level>
             </filter>
             <destination>${logstashUrl}</destination>
             <encoder class="net.logstash.logback.encoder.LogstashEncoder">
@@ -17,9 +17,9 @@
             </encoder>
         </appender>
 
-        <logger name="com.itmo" level="DEBUG"/>
+        <logger name="com.itmo" level="TRACE"/>
 
-        <root level="DEBUG">
+        <root level="TRACE">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="LOGSTASH"/>
         </root>
