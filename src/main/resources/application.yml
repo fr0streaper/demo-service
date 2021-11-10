@@ -10,6 +10,7 @@ spring:
     database: postgresql
     hibernate:
       ddl-auto: update
+    show-sql: true
 
 server:
   error:
