@@ -3,12 +3,10 @@ package com.itmo.microservices.demo.users.impl.entity
 import org.hibernate.annotations.GenericGenerator
 import org.hibernate.annotations.Type
 import java.util.*
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
+import javax.persistence.*
 
 @Entity
+@Table(name = "users")
 class AppUser {
 
     @Id

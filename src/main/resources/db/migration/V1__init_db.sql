@@ -1,6 +1,6 @@
 -- user service
 
-create table if not exists app_user (
+create table if not exists users (
     id uuid primary key,
     username varchar(64) unique not null,
     name varchar(255) not null,
