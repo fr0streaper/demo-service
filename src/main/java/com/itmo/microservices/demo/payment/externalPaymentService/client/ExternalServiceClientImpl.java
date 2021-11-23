@@ -26,13 +26,8 @@ public class ExternalServiceClientImpl implements ExternalServiceClient {
                 .build();
 
         try {
-            var response = externalPaymentServiceRestTemplate
+            return externalPaymentServiceRestTemplate
                     .postForObject(url.toUriString(), request, ExternalServiceResponse.class);
-            if (response == null || response.getStatus() == ExternalServiceResponseStatus.FAILURE) {
-                return null; // TODO:: replace with exception
-            }
-
-            return response;
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             log.warn(e.getMessage());
             return null;

@@ -2,6 +2,8 @@ package com.itmo.microservices.demo.payment.impl.service;
 
 
 import com.itmo.microservices.demo.payment.PaymentServiceConstants;
+import com.itmo.microservices.demo.payment.api.exception.PaymentServiceException;
+import com.itmo.microservices.demo.payment.api.exception.TransactionException;
 import com.itmo.microservices.demo.payment.api.model.FinancialOperationType;
 import com.itmo.microservices.demo.payment.api.model.PaymentSubmissionDto;
 import com.itmo.microservices.demo.payment.api.model.UserAccountFinancialLogRecordDto;
@@ -50,7 +52,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public PaymentSubmissionDto executeOrderPayment(String username, UUID orderId) throws UserNotFoundException {
+    public PaymentSubmissionDto executeOrderPayment(String username, UUID orderId) throws UserNotFoundException, PaymentServiceException {
         var user = getUserByUsername(username);
 
         try {
@@ -72,8 +74,7 @@ public class PaymentServiceImpl implements PaymentService {
                     .transactionID(finlog.getPaymentTransactionId())
                     .build();
         } catch (ExternalServiceException e) {
-            e.printStackTrace(); // TODO:: :(((
-            return null;
+            throw new TransactionException(e.getMessage());
         }
     }
 

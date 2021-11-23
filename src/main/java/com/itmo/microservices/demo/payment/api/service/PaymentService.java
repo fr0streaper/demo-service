@@ -1,5 +1,7 @@
 package com.itmo.microservices.demo.payment.api.service;
 
+import com.itmo.microservices.demo.payment.api.exception.PaymentServiceException;
+import com.itmo.microservices.demo.payment.api.exception.TransactionException;
 import com.itmo.microservices.demo.payment.api.model.PaymentSubmissionDto;
 import com.itmo.microservices.demo.payment.api.model.UserAccountFinancialLogRecordDto;
 import com.itmo.microservices.demo.users.api.exception.UserNotFoundException;
@@ -11,5 +13,5 @@ import java.util.UUID;
 public interface PaymentService {
 
     List<UserAccountFinancialLogRecordDto> getFinlog(String username, UUID orderId) throws UserNotFoundException;
-    PaymentSubmissionDto executeOrderPayment(String username, UUID orderId) throws UserNotFoundException;
+    PaymentSubmissionDto executeOrderPayment(String username, UUID orderId) throws UserNotFoundException, PaymentServiceException;
 }
