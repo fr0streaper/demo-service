@@ -25,7 +25,7 @@ class OrderEntity {
     var deliveryDuration: Int? = 0
 
     @OneToMany
-    var itemsMap: List<OrderItemEntity>? = null
+    var orderItems: List<OrderItemEntity>? = null
 
     @OneToMany
     var paymentHistory: MutableList<PaymentLogRecordEntity>? = null
@@ -45,7 +45,7 @@ class OrderEntity {
         this.userId = userId
         this.timeCreated = timeCreated
         this.status = status
-        this.itemsMap = itemsMap
+        this.orderItems = itemsMap
         this.deliveryDuration = deliveryDuration
         this.paymentHistory = paymentHistory
     }

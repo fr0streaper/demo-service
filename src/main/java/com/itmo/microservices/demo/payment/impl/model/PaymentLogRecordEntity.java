@@ -1,5 +1,6 @@
 package com.itmo.microservices.demo.payment.impl.model;
 
+import com.itmo.microservices.demo.payment.api.model.PaymentLogRecordDto;
 import com.itmo.microservices.demo.payment.api.model.PaymentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,4 +39,8 @@ public class PaymentLogRecordEntity {
 	private PaymentStatus type;
 	private Integer amount;
 	private LocalDateTime timestamp;
+
+	public PaymentLogRecordDto toModel() {
+		return new PaymentLogRecordDto(transactionId, timestamp, type, amount);
+	}
 }
