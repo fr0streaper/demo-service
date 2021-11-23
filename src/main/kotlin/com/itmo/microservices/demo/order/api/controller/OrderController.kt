@@ -91,5 +91,5 @@ class OrderController(private val orderService: OrderService, private val paymen
         @Parameter(hidden = true)
         @AuthenticationPrincipal user: UserDetails,
         @PathVariable order_id: UUID
-    ): PaymentSubmissionDto = paymentService.executeOrderPayment(user, order_id)
+    ): PaymentSubmissionDto = paymentService.executeOrderPayment(user.username, order_id)
 }
