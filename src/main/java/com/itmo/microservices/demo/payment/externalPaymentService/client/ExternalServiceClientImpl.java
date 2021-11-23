@@ -1,0 +1,33 @@
+package com.itmo.microservices.demo.payment.externalPaymentService.client;
+
+import com.itmo.microservices.demo.payment.PaymentServiceConstants;
+import com.itmo.microservices.demo.payment.externalPaymentService.client.model.ExternalServiceRequest;
+import com.itmo.microservices.demo.payment.externalPaymentService.client.model.ExternalServiceResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
+@RequiredArgsConstructor
+@Component
+public class ExternalServiceClientImpl implements ExternalServiceClient {
+
+    private final RestTemplate externalPaymentServiceRestTemplate;
+
+    @Override
+    public ExternalServiceResponse executePayment(ExternalServiceRequest request) {
+        var url = UriComponentsBuilder
+                .fromPath(PaymentServiceConstants.EXTERNAL_SERVICE_TRANSACTIONS_URL)
+                .build();
+
+        try {
+            return externalPaymentServiceRestTemplate
+                    .postForObject(url.toUriString(), request, ExternalServiceResponse.class);
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            // TODO:: log something, maybe throw
+            return null;
+        }
+    }
+}

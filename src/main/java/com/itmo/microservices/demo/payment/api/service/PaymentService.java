@@ -11,5 +11,5 @@ import java.util.UUID;
 public interface PaymentService {
 
     List<UserAccountFinancialLogRecordDto> getFinlog(String username, UUID orderId) throws UserNotFoundException;
-    PaymentSubmissionDto executeOrderPayment(UserDetails user, UUID orderId);
+    PaymentSubmissionDto executeOrderPayment(String username, UUID orderId) throws UserNotFoundException;
 }
