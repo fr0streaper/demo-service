@@ -4,5 +4,6 @@ import com.itmo.microservices.demo.delivery.externalDeliveryService.client.model
 import com.itmo.microservices.demo.delivery.externalDeliveryService.client.model.ExternalServiceResponse
 
 interface ExternalServiceClient {
-    fun getDeliveryParams(request: ExternalServiceRequest): ExternalServiceResponse?
+    fun getDeliveryTransactionId(request: ExternalServiceRequest): ExternalServiceResponse?
+    fun getDeliveryParams(request: ExternalServiceRequest, transactionId: String): ExternalServiceResponse?
 }

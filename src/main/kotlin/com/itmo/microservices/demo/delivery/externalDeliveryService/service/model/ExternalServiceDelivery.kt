@@ -8,7 +8,7 @@ import java.util.*
 @Data
 data class ExternalServiceDelivery (
     val id: UUID? = null,
-    val title: String = "жопа",
+    val title: String = "",
     val status: ExternalServiceResponseStatus? = null,
     val submitTime: Timestamp? = null,
     val completedTime: Timestamp? = null,

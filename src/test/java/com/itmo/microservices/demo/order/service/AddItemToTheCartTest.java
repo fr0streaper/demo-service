@@ -74,7 +74,7 @@ public class AddItemToTheCartTest {
         when(tokenManager.generateRefreshToken(any())).thenReturn("refreshToken");
 
         var userService = new DefaultUserService(userRepository, passwordEncoder, eventBus, tokenManager);
-
+        orderItemRepository = mock(OrderItemRepository.class);
         orderService = new DefaultOrderService(orderRepository, orderItemRepository, itemService, userService);
     }
 

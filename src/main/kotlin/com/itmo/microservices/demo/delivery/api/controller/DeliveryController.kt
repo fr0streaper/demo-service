@@ -8,8 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.springframework.web.bind.annotation.*
-import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 
 @RestController
@@ -26,8 +25,7 @@ class DeliveryController (private val deliveryService: DeliveryService) {
         security = [SecurityRequirement(name = "bearerAuth")]
     )
     fun getAvailableDeliverySlots(
-        @RequestParam("number") number: Int
-    ): /*List<LocalDateTime>*/ ExternalServiceDelivery = deliveryService.getAvailableDeliverySlots(number)
+    ): ExternalServiceDelivery = deliveryService.getAvailableDeliverySlots()
 
     @PostMapping("/{order_id}/time")
     @Operation(
