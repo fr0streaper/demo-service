@@ -27,9 +27,10 @@ fun OrderEntity.orderItemsListToMap(orderItemRepository: OrderItemRepository): M
     val orderItemMap: Map<OrderItemDto, Int> = mutableMapOf()
 
     //refactor list to map
-    if (orderItemEntityList != null)
-    for (orderItem in orderItemEntityList) {
-        orderItemMap.plus(Pair(orderItem.toModel(), orderItem.amount))
+    if (orderItemEntityList != null) {
+        for (orderItem in orderItemEntityList) {
+            orderItemMap.plus(Pair(orderItem.toModel(), orderItem.amount))
+        }
     }
 
     return orderItemMap
