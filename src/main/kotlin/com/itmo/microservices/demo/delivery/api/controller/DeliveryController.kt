@@ -1,6 +1,7 @@
 package com.itmo.microservices.demo.delivery.api.controller
 
 import com.itmo.microservices.demo.delivery.api.service.DeliveryService
+import com.itmo.microservices.demo.delivery.externalDeliveryService.service.model.ExternalServiceDelivery
 import com.itmo.microservices.demo.lib.common.delivery.dto.BookingDto
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -26,7 +27,7 @@ class DeliveryController (private val deliveryService: DeliveryService) {
     )
     fun getAvailableDeliverySlots(
         @RequestParam("number") number: Int
-    ): List<LocalDateTime> = deliveryService.getAvailableDeliverySlots(number)
+    ): /*List<LocalDateTime>*/ ExternalServiceDelivery = deliveryService.getAvailableDeliverySlots(number)
 
     @PostMapping("/{order_id}/time")
     @Operation(
