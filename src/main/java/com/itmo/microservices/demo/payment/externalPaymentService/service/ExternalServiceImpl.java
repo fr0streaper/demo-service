@@ -9,7 +9,11 @@ import com.itmo.microservices.demo.payment.externalPaymentService.service.except
 import com.itmo.microservices.demo.payment.externalPaymentService.service.model.ExternalServicePayment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -20,8 +24,9 @@ public class ExternalServiceImpl implements ExternalService {
 
     private final int maxAttempts = 3;
 
+    @Async("executorService")
     @Override
-    public ExternalServicePayment executePayment(String clientSecret) throws ExternalServiceException {
+    public CompletableFuture<ExternalServicePayment> executePayment(String clientSecret) throws CompletionException {
         ExternalServiceResponse clientResponse;
 
         for (int attempt = 1; ; ++attempt) {
@@ -29,10 +34,12 @@ public class ExternalServiceImpl implements ExternalService {
 
             if (clientResponse == null) {
                 if (attempt == maxAttempts) {
-                    throw new ExternalServiceException(String.format(
+                    return CompletableFuture.failedFuture(
+                        new ExternalServiceException(String.format(
                             "%s Cannot execute payment transaction with client secret: '%s'. Reason: client error. " +
                                     "It was last attempt: %s",
-                            PaymentServiceConstants.EXTERNAL_SERVICE_MARKER, clientSecret, attempt));
+                            PaymentServiceConstants.EXTERNAL_SERVICE_MARKER, clientSecret, attempt))
+                    );
                 } else {
                     log.info("{} Transaction with client secret: {} client error. Attempt: {} of {}. Retrying ...",
                             PaymentServiceConstants.EXTERNAL_SERVICE_MARKER, clientSecret, attempt, maxAttempts);
@@ -43,11 +50,13 @@ public class ExternalServiceImpl implements ExternalService {
         }
 
         if (clientResponse.getStatus() == ExternalServiceResponseStatus.FAILURE) {
-            throw new ExternalServiceException(String.format(
-                    "%s Cannot execute payment transaction with client secret: '%s'. Reason: transaction failed",
-                    PaymentServiceConstants.EXTERNAL_SERVICE_MARKER, clientSecret));
+            return CompletableFuture.failedFuture(
+                new ExternalServiceException(String.format(
+                    "%s Cannot execute payment transaction. Reason: transaction failed",
+                    PaymentServiceConstants.EXTERNAL_SERVICE_MARKER))
+            );
         }
 
-        return ExternalServicePayment.create(clientResponse);
+        return CompletableFuture.completedFuture(ExternalServicePayment.create(clientResponse));
     }
 }

@@ -25,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -56,7 +57,7 @@ public class PaymentServiceImpl implements PaymentService {
         var user = getUserByUsername(username);
 
         try {
-            var externalServicePayment = externalService.executePayment(clientSecret);
+            var externalServicePayment = externalService.executePayment(clientSecret).join();
 
             var finlog = UserAccountFinancialLogRecord.builder()
                     .userId(user.getId())
@@ -73,7 +74,7 @@ public class PaymentServiceImpl implements PaymentService {
                     .timestamp(finlog.getTimestamp())
                     .transactionID(finlog.getPaymentTransactionId())
                     .build();
-        } catch (ExternalServiceException e) {
+        } catch (CompletionException e) {
             throw new TransactionException(e.getMessage());
         }
     }

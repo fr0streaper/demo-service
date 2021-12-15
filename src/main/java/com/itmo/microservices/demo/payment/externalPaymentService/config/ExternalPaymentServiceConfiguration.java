@@ -11,6 +11,8 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Duration;
+
 @RequiredArgsConstructor
 @Configuration
 public class ExternalPaymentServiceConfiguration {
@@ -21,6 +23,8 @@ public class ExternalPaymentServiceConfiguration {
     @Bean(name = "externalPaymentServiceRestTemplate")
     public RestTemplate externalPaymentServiceRestTemplate() {
         return new RestTemplateBuilder()
+                .setConnectTimeout(Duration.ofMillis(3000))
+                .setReadTimeout(Duration.ofMillis(3000))
                 .messageConverters(
                         new MappingJackson2HttpMessageConverter(),
                         new StringHttpMessageConverter(),
