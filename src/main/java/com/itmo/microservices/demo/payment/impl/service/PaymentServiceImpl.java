@@ -1,7 +1,8 @@
 package com.itmo.microservices.demo.payment.impl.service;
 
 import com.itmo.microservices.demo.order.api.service.OrderService;
-import io.prometheus.client.Counter;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 
 import com.itmo.microservices.demo.payment.PaymentServiceConstants;
 import com.itmo.microservices.demo.payment.api.model.FinancialOperationType;
@@ -14,6 +15,7 @@ import com.itmo.microservices.demo.payment.utils.UserAccountFinancialLogRecordUt
 import com.itmo.microservices.demo.users.api.exception.UserNotFoundException;
 import com.itmo.microservices.demo.users.api.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +31,9 @@ public class PaymentServiceImpl implements PaymentService {
     private final UserAccountFinancialLogRecordRepository userAccountFinancialLogRecordRepository;
     private final OrderService orderService;
     private final UserService userService;
-    private static final String serviceName = "p03";
+    private final MeterRegistry meterRegistry;
+    @Value("#{environment['service.name']}")
+    private String serviceName = "";
 
     @Override
     public List<UserAccountFinancialLogRecordDto> getFinlog(String name, UUID orderId) throws UserNotFoundException {
@@ -60,19 +64,22 @@ public class PaymentServiceImpl implements PaymentService {
                 .collect(Collectors.toList());
     }
 
-    static final Counter revenue =
-            Counter.build().name("revenue_total").help("Total revenue").labelNames("serviceName").register();
+    //static final Counter revenue =
+            //Counter.build().name("revenue_total").help("Total revenue").labelNames("serviceName").register();
+    private Counter.Builder revenue = Counter.builder("revenue_total").description("Total revenue");
 
     @Override
     public PaymentSubmissionDto executeOrderPayment(UserDetails user, UUID orderId) {
         var order = orderService.getOrder(orderId);
         if (order != null) {
             var itemsMap = order.getItemsMap();
+            Counter counter = revenue.tags("serviceName", "p03").register(meterRegistry);
             if (itemsMap != null) {
                 itemsMap.forEach((orderItemDto, items_count) -> {
                     var price = orderItemDto.getPrice();
                     if (price != null)
-                        revenue.labels(serviceName).inc(price * items_count);
+                        //revenue.labels(serviceName).inc(price * items_count);
+                        counter.increment(price * items_count);
                 });
             }
         }

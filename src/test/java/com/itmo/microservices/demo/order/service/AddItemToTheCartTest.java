@@ -14,6 +14,7 @@ import com.itmo.microservices.demo.users.impl.entity.AppUser;
 import com.itmo.microservices.demo.users.impl.repository.UserRepository;
 import com.itmo.microservices.demo.users.impl.service.DefaultUserService;
 import com.itmo.microservices.demo.users.impl.service.JwtTokenManager;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.ArgumentCaptor;
@@ -75,8 +76,10 @@ public class AddItemToTheCartTest {
 
         var userService = new DefaultUserService(userRepository, passwordEncoder, eventBus, tokenManager);
 
+        var meterRegistry = new SimpleMeterRegistry();
+
         orderItemRepository = mock(OrderItemRepository.class);
-        orderService = new DefaultOrderService(orderRepository, orderItemRepository, itemService, userService);
+        orderService = new DefaultOrderService(orderRepository, orderItemRepository, itemService, userService, meterRegistry);
     }
 
     @Test

@@ -11,30 +11,29 @@ import com.itmo.microservices.demo.lib.common.order.repository.OrderItemReposito
 import com.itmo.microservices.demo.lib.common.order.mapper.toModel
 import com.itmo.microservices.demo.lib.common.order.repository.OrderRepository
 import com.itmo.microservices.demo.users.api.service.UserService
+import io.micrometer.core.instrument.Counter
+import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
-import io.prometheus.client.Counter
+import org.springframework.beans.factory.annotation.Value
 import java.util.*
 import org.webjars.NotFoundException
-import org.springframework.beans.factory.annotation.Value
 
 @Service
 class DefaultOrderService(
     private val orderRepository: OrderRepository,
     private val orderItemRepository: OrderItemRepository,
     private val itemService: WarehouseService,
-    private val userService: UserService
+    private val userService: UserService,
+    private val meterRegistry: MeterRegistry
     ): OrderService {
-    @Value("\${service.name}")
+    @Value("#{environment['service.name']}")
     val serviceName : String = "";
 
-    private val orderCreatedCount : Counter =
-        Counter.build()
-            .name("order_created")
-            .help("Count of created orders")
-            .labelNames("serviceName")
-            .register();
+    private val orderCreatedCount =
+        Counter.builder("order_created")
+            .description("Count of created orders")
 
     override fun getOrder(orderId: UUID): OrderDto {
         val optionalOrder = orderRepository.findById(orderId)
@@ -52,7 +51,9 @@ class DefaultOrderService(
         }
         val accountData = userService.getAccountData(currentUser)
         orderEntity.userId = accountData.id
-        orderCreatedCount.labels(serviceName).inc();
+
+        orderCreatedCount.tag("serviceName", serviceName).register(meterRegistry).increment()
+
         return orderRepository.save(orderEntity).toModel(orderItemRepository)
     }
 
