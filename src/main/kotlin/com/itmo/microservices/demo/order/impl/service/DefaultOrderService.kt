@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service
 import io.prometheus.client.Counter
 import java.util.*
 import org.webjars.NotFoundException
-
+import org.springframework.beans.factory.annotation.Value
 
 @Service
 class DefaultOrderService(
@@ -26,14 +26,14 @@ class DefaultOrderService(
     private val itemService: WarehouseService,
     private val userService: UserService
     ): OrderService {
-    @Value("\${serivce.name}")
+    @Value("\${service.name}")
     val serviceName : String = "";
 
     private val orderCreatedCount : Counter =
         Counter.build()
             .name("order_created")
             .help("Count of created orders")
-            .labelName("serviceName")
+            .labelNames("serviceName")
             .register();
 
     override fun getOrder(orderId: UUID): OrderDto {
