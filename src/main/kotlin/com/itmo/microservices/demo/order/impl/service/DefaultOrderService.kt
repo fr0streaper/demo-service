@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service
 import io.prometheus.client.Counter
 import java.util.*
 import org.webjars.NotFoundException
-
+import org.springframework.beans.factory.annotation.Value
 
 @Service
 class DefaultOrderService(
