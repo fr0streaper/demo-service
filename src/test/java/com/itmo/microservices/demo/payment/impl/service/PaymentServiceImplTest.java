@@ -1,5 +1,6 @@
 package com.itmo.microservices.demo.payment.impl.service;
 
+import com.itmo.microservices.demo.order.api.service.OrderService;
 import com.itmo.microservices.demo.payment.api.model.FinancialOperationType;
 import com.itmo.microservices.demo.payment.api.model.PaymentSubmissionDto;
 import com.itmo.microservices.demo.payment.impl.model.UserAccountFinancialLogRecord;
@@ -35,6 +36,9 @@ public class PaymentServiceImplTest {
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private OrderService orderService;
 
     @Mock
     private UserDetails userDetails;
