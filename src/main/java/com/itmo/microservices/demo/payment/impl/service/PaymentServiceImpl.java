@@ -61,7 +61,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     static final Counter revenue =
-            Counter.build().name("revenue_total").help("Total revenue").labelNames(serviceName).register();
+            Counter.build().name("revenue_total").help("Total revenue").labelNames("serviceName").register();
 
     @Override
     public PaymentSubmissionDto executeOrderPayment(UserDetails user, UUID orderId) {
@@ -72,7 +72,7 @@ public class PaymentServiceImpl implements PaymentService {
                 itemsMap.forEach((orderItemDto, items_count) -> {
                     var price = orderItemDto.getPrice();
                     if (price != null)
-                        revenue.inc(price * items_count);
+                        revenue.labels(serviceName).inc(price * items_count);
                 });
             }
         }
