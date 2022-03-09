@@ -13,6 +13,7 @@ import com.itmo.microservices.demo.users.impl.entity.AppUser;
 import com.itmo.microservices.demo.users.impl.repository.UserRepository;
 import com.itmo.microservices.demo.users.impl.service.DefaultUserService;
 import com.itmo.microservices.demo.users.impl.service.JwtTokenManager;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -77,7 +78,9 @@ public class OrderServiceTests {
 
 		var userService = new DefaultUserService(userRepository, passwordEncoder, eventBus, tokenManager);
 
-		orderService = new DefaultOrderService(orderRepository, orderItemRepository, mock(DefaultWarehouseService.class), userService);
+		var meterRegistry = new SimpleMeterRegistry();
+
+		orderService = new DefaultOrderService(orderRepository, orderItemRepository, mock(DefaultWarehouseService.class), userService, meterRegistry);
 	}
 
 	@Test

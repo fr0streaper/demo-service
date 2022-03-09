@@ -2,6 +2,7 @@ package com.itmo.microservices.demo.delivery.impl.service;
 
 import com.itmo.microservices.demo.delivery.api.service.DeliveryService;
 import com.itmo.microservices.demo.lib.common.delivery.dto.BookingDto;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -12,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestDeliveryService {
 
-	DeliveryService deliveryService = new DefaultDeliveryService();
+	DeliveryService deliveryService = new DefaultDeliveryService(new SimpleMeterRegistry());
 
 	@Test
 	public void testGetAvailableDeliverySlots() {

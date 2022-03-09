@@ -3,40 +3,29 @@ package com.itmo.microservices.demo.users.impl.service;
 import com.google.common.eventbus.EventBus;
 import com.itmo.microservices.demo.users.api.model.AppUserModel;
 import com.itmo.microservices.demo.users.api.model.RegistrationRequest;
+import com.itmo.microservices.demo.users.api.service.UserService;
 import com.itmo.microservices.demo.users.impl.entity.AppUser;
 import com.itmo.microservices.demo.users.impl.repository.UserRepository;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
 
-import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
+
 @SuppressWarnings("UnstableApiUsage")
-@RunWith(MockitoJUnitRunner.class)
 public class SaveAndGetUserInformationTest {
     private AppUser appUser;
     private UUID globalUUID;
 
-    @InjectMocks
-    DefaultUserService userService;
+    UserService userService;
 
-    @Mock
-    UserRepository repository;
-    @Mock
-    JwtTokenManager tokenManager;
-    @Mock
-    EventBus eventBus;
-    @Mock
-    PasswordEncoder passwordEncoder;
-
-    @Before
+    @BeforeEach
     public void setUp() {
         appUser = new AppUser(
                 "name",
@@ -46,17 +35,25 @@ public class SaveAndGetUserInformationTest {
         globalUUID = UUID.randomUUID();
         appUser.setId(globalUUID);
 
-        when(repository.findByUsername("name")).thenReturn(appUser);
-        when(repository.save(any())).thenReturn(appUser);
+        var userRepository = mock(UserRepository.class);
+        when(userRepository.findByUsername("name")).thenReturn(appUser);
+        when(userRepository.save(any())).thenReturn(appUser);
 
+        var passwordEncoder = mock(PasswordEncoder.class);
         when(passwordEncoder.encode("password")).thenReturn("encodedPassword");
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
+        var eventBus = mock(EventBus.class);
+        var tokenManager = mock(JwtTokenManager.class);
+        when(tokenManager.generateToken(any())).thenReturn("token");
+        when(tokenManager.generateRefreshToken(any())).thenReturn("refreshToken");
 
+        userService = new DefaultUserService(userRepository, passwordEncoder, eventBus, tokenManager);
     }
 
     private final RegistrationRequest request = new RegistrationRequest("name", "password");
 
-    @org.junit.Test
+    @Test
     public void registerTest() {
         userService.registerUser(request);
         AppUserModel user = new AppUserModel(
@@ -64,19 +61,19 @@ public class SaveAndGetUserInformationTest {
                 "name",
                 "password"
         );
-        Assert.assertEquals(user.getName(), userService.getUser("name").getUsername());
-        Assert.assertEquals(user.getPassword(), userService.getUser("name").getPassword());
+        Assertions.assertEquals(user.getName(), userService.getUser("name").getUsername());
+        Assertions.assertEquals(user.getPassword(), userService.getUser("name").getPassword());
     }
 
-    @org.junit.Test
+    @Test
     public void findUserTest() {
         AppUserModel user = new AppUserModel(
                 globalUUID,
                 "name",
                 "password"
         );
-        Assert.assertEquals(user.getName(), userService.getUser("name").getUsername());
-        Assert.assertEquals(user.getPassword(), userService.getUser("name").getPassword());
-        Assert.assertNull(userService.getUser("anothername"));
+        Assertions.assertEquals(user.getName(), userService.getUser("name").getUsername());
+        Assertions.assertEquals(user.getPassword(), userService.getUser("name").getPassword());
+        Assertions.assertNull(userService.getUser("anothername"));
     }
 }
