@@ -11,6 +11,6 @@ data class OrderDto(
     var id: UUID?,
     var timeCreated: Long = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
     var status: OrderStatusEnum = OrderStatusEnum.COLLECTING,
-    var itemsMap: Map<OrderItemDto, Int>?,
+    var itemsMap: Map<UUID, Int>?,
     var deliveryDuration: Int?,
     var paymentHistory: List<PaymentLogRecordDto>?)

@@ -1,5 +1,7 @@
 package com.itmo.microservices.demo.payment.impl.service;
 
+import com.itmo.microservices.demo.lib.common.order.entity.OrderItemEntity;
+import com.itmo.microservices.demo.lib.common.order.repository.OrderItemRepository;
 import com.itmo.microservices.demo.order.api.service.OrderService;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -15,20 +17,25 @@ import com.itmo.microservices.demo.payment.utils.UserAccountFinancialLogRecordUt
 import com.itmo.microservices.demo.users.api.exception.UserNotFoundException;
 import com.itmo.microservices.demo.users.api.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class PaymentServiceImpl implements PaymentService {
+    private final Logger log = LoggerFactory.getLogger(PaymentServiceImpl.class);
 
     private final UserAccountFinancialLogRecordRepository userAccountFinancialLogRecordRepository;
+    private final OrderItemRepository orderItemRepository;
     private final OrderService orderService;
     private final UserService userService;
     private final MeterRegistry meterRegistry;
@@ -75,11 +82,16 @@ public class PaymentServiceImpl implements PaymentService {
             var itemsMap = order.getItemsMap();
             Counter counter = revenue.tags("serviceName", "p03").register(meterRegistry);
             if (itemsMap != null) {
-                itemsMap.forEach((orderItemDto, items_count) -> {
-                    var price = orderItemDto.getPrice();
-                    if (price != null)
-                        //revenue.labels(serviceName).inc(price * items_count);
-                        counter.increment(price * items_count);
+                itemsMap.forEach((orderItemUUID, items_count) -> {
+                    Optional<OrderItemEntity> orderItem = orderItemRepository.findById(orderItemUUID);
+                    if (orderItem.isEmpty()) {
+                        log.error("Order item with id [{}] was not found in DB", orderItemUUID);
+                    } else {
+                        var price = orderItem.get().getPrice();
+                        if (price != null)
+                            //revenue.labels(serviceName).inc(price * items_count);
+                            counter.increment(price * items_count);
+                    }
                 });
             }
         }

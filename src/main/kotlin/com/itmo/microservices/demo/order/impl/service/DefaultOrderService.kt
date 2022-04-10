@@ -33,7 +33,7 @@ class DefaultOrderService(
     ): OrderService {
 
     companion object {
-        val log: Logger = LoggerFactory.getLogger(TaskModuleEventListener::class.java)
+        val log: Logger = LoggerFactory.getLogger(DefaultOrderService::class.java)
     }
 
     @Value("#{environment['service.name']}")
@@ -84,7 +84,7 @@ class DefaultOrderService(
         val orderEntity = orderRepository.getById(orderId)
         val orderItemId = UUID.randomUUID()
         val orderItemEntity = OrderItemDto(orderItemId, item.title, item.price).toEntity(amount, orderEntity)
-        orderItemRepository.save(orderItemEntity)
+        orderItemRepository.saveAndFlush(orderItemEntity)
         log.info("Saved: Order with id [${orderItemEntity.id}] has [${orderItemEntity.amount}] amount")
         val savedOrderItemEntity = orderItemRepository.findById(orderItemId)
         if (savedOrderItemEntity.isEmpty) {
