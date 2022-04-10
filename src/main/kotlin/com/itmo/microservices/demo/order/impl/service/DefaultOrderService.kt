@@ -45,10 +45,10 @@ class DefaultOrderService(
 
     override fun getOrder(orderId: UUID): OrderDto {
         val optionalOrder = orderRepository.findById(orderId)
-        if (!optionalOrder.isPresent) {
+        if (optionalOrder.isEmpty) {
             throw NotFoundException("Order with Order ID $orderId not found")
         }
-        return orderRepository.findById(orderId).get().toModel(orderItemRepository)
+        return optionalOrder.get().toModel(orderItemRepository)
     }
 
     override fun createOrder(user: UserDetails): OrderDto {
