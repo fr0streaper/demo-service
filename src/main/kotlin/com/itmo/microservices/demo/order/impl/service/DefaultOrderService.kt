@@ -86,7 +86,10 @@ class DefaultOrderService(
         val orderItemEntity = OrderItemDto(orderItemId, item.title, item.price).toEntity(amount, orderEntity)
         orderItemRepository.save(orderItemEntity)
         log.info("Saved: Order with id [${orderItemEntity.id}] has [${orderItemEntity.amount}] amount")
-        val savedOrderItemEntity = orderItemRepository.getById(orderItemId)
-        log.info("Got: Order with id [${savedOrderItemEntity.id}] has [${savedOrderItemEntity.amount}] amount")
+        val savedOrderItemEntity = orderItemRepository.findById(orderItemId)
+        if (savedOrderItemEntity.isEmpty) {
+            throw NotFoundException("OrderItem with id ${orderItemId} not found")
+        }
+        log.info("Got: Order with id [${savedOrderItemEntity.get().id}] has [${savedOrderItemEntity.get().amount}] amount")
     }
 }
