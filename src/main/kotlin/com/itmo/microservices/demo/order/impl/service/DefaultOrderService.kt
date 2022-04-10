@@ -48,6 +48,7 @@ class DefaultOrderService(
         if (optionalOrder.isEmpty) {
             throw NotFoundException("Order with Order ID $orderId not found")
         }
+        log.info("Order with Order ID [${orderId}] found")
         return optionalOrder.get().toModel(orderItemRepository)
     }
 
@@ -84,13 +85,7 @@ class DefaultOrderService(
         val orderEntity = orderRepository.getById(orderId)
         val orderItemId = UUID.randomUUID()
         val orderItemEntity = OrderItemDto(orderItemId, item.title, item.price).toEntity(amount, orderEntity, itemId)
-        orderItemRepository.saveAndFlush(orderItemEntity)
+        orderItemRepository.save(orderItemEntity)
         log.info("Saved: Order with id [${orderItemEntity.id}] has [${orderItemEntity.amount}] amount")
-        val savedOrderItemEntity = orderItemRepository.findById(orderItemId)
-        if (savedOrderItemEntity.isEmpty) {
-            log.error("OrderItem with id [$orderItemId] not found")
-        } else {
-            log.info("Got: Order with id [${savedOrderItemEntity.get().id}] has [${savedOrderItemEntity.get().amount}] amount")
-        }
     }
 }

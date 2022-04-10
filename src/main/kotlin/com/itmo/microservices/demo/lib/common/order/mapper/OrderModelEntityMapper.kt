@@ -16,14 +16,16 @@ fun OrderEntity.toModel(orderItemRepository: OrderItemRepository): OrderDto = Or
     paymentHistory = emptyList()
 )
 
-fun OrderEntity.listToMap(orderItemRepository: OrderItemRepository): Map<UUID, Int>? {
-    //get list of all items bounded with current order
-    val orderItemEntityList: List<OrderItemEntity> = orderItemRepository.findByOrderEntity(this) ?: return null
-    //create empty map for future dto
-    val orderItemMap: Map<UUID, Int> = mutableMapOf()
-    //refactor list to map
-    for (orderItem in orderItemEntityList) {
-        orderItemMap.plus(Pair(orderItem.itemId, orderItem.amount))
+fun OrderEntity.listToMap(orderItemRepository: OrderItemRepository): Map<UUID, Int> {
+    val orderItemEntityList: List<OrderItemEntity>? = orderItemRepository.findByOrderEntity(this)
+
+    return if (orderItemEntityList != null) {
+        val orderItemMap: MutableMap<UUID, Int> = mutableMapOf()
+        for (orderItem in orderItemEntityList) {
+            orderItemMap[orderItem.itemId!!] = orderItem.amount!!
+        }
+        orderItemMap
+    } else {
+        mutableMapOf()
     }
-    return orderItemMap
 }
