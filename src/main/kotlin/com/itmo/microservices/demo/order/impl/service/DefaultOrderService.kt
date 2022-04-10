@@ -10,9 +10,12 @@ import com.itmo.microservices.demo.lib.common.order.mapper.toEntity
 import com.itmo.microservices.demo.lib.common.order.repository.OrderItemRepository
 import com.itmo.microservices.demo.lib.common.order.mapper.toModel
 import com.itmo.microservices.demo.lib.common.order.repository.OrderRepository
+import com.itmo.microservices.demo.tasks.impl.messaging.TaskModuleEventListener
 import com.itmo.microservices.demo.users.api.service.UserService
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
@@ -28,6 +31,11 @@ class DefaultOrderService(
     private val userService: UserService,
     private val meterRegistry: MeterRegistry
     ): OrderService {
+
+    companion object {
+        val log: Logger = LoggerFactory.getLogger(TaskModuleEventListener::class.java)
+    }
+
     @Value("#{environment['service.name']}")
     val serviceName : String = "";
 
@@ -65,11 +73,18 @@ class DefaultOrderService(
     }
 
     override fun addItemToBasket(itemId: UUID, orderId: UUID, amount: Int) {
+        log.info("Process adding item with id [${itemId}] to order with id [${orderId}]. Amount [${amount}]")
         val item = itemService.getItem(itemId)
-            ?: throw NotFoundException("Item with item_id $itemId not found")
-
+        if (item == null) {
+            log.info("Item with item_id [$itemId] not found")
+            throw NotFoundException("Item with item_id $itemId not found")
+        } else {
+            log.info("Item with item_id [$itemId] found")
+        }
         val orderEntity = orderRepository.getById(orderId)
         val orderItemEntity = OrderItemDto(UUID.randomUUID(), item.title, item.price).toEntity(amount, orderEntity)
         orderItemRepository.save(orderItemEntity)
+        val savedOrderItemEntity = orderItemRepository.getById(orderId)
+        log.info("Order with id [${savedOrderItemEntity.id}] has [${savedOrderItemEntity.amount}] amount")
     }
 }
