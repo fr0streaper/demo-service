@@ -83,7 +83,7 @@ class DefaultOrderService(
         }
         val orderEntity = orderRepository.getById(orderId)
         val orderItemId = UUID.randomUUID()
-        val orderItemEntity = OrderItemDto(orderItemId, item.title, item.price).toEntity(amount, orderEntity)
+        val orderItemEntity = OrderItemDto(orderItemId, item.title, item.price).toEntity(amount, orderEntity, itemId)
         orderItemRepository.saveAndFlush(orderItemEntity)
         log.info("Saved: Order with id [${orderItemEntity.id}] has [${orderItemEntity.amount}] amount")
         val savedOrderItemEntity = orderItemRepository.findById(orderItemId)

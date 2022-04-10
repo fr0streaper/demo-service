@@ -1,0 +1,1 @@
+alter table order_items add column item_id uuid;
