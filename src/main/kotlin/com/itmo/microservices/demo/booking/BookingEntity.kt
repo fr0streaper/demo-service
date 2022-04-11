@@ -14,7 +14,6 @@ import javax.persistence.Table
 class BookingEntity {
 
     @Id
-    @GeneratedValue
     @Column(columnDefinition = "uuid", updatable = false)
     var id: UUID? = null
 
