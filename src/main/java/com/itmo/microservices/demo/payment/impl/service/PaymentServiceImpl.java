@@ -114,14 +114,11 @@ public class PaymentServiceImpl implements PaymentService {
             return null;
         }
         if (transactionResponse.getStatus() != TransactionStatus.SUCCESS) {
-            log.info("External system returned [{}}] for order with id [{}]", transactionResponse.getStatus(), orderId);
+            log.info("External system returned [{}] for order with id [{}]", transactionResponse.getStatus(), orderId);
             return null;
         }
 
         log.info("External system returned SUCCESS for order with id [{}]", orderId);
-        return PaymentSubmissionDto.builder()
-                .timestamp(System.currentTimeMillis())
-                .transactionID(transactionResponse.getId())
-                .build();
+        return new PaymentSubmissionDto(System.currentTimeMillis(), transactionResponse.getId());
     }
 }
