@@ -2,6 +2,7 @@ package com.itmo.microservices.demo.payment.impl.service;
 
 import com.itmo.microservices.demo.lib.common.order.repository.OrderRepository;
 import com.itmo.microservices.demo.payment.api.model.FinancialOperationType;
+import com.itmo.microservices.demo.payment.api.model.PaymentSubmissionDto;
 import com.itmo.microservices.demo.payment.impl.model.UserAccountFinancialLogRecord;
 import com.itmo.microservices.demo.payment.impl.repository.UserAccountFinancialLogRecordRepository;
 import com.itmo.microservices.demo.users.api.exception.UserNotFoundException;
@@ -78,6 +79,6 @@ public class PaymentServiceImplTest {
 
     @Test
     public void executeOrderPaymentTest() {
-        Assert.assertNull(paymentService.executeOrderPayment(userDetails, id));
+        Assert.assertEquals(PaymentSubmissionDto.class, paymentService.executeOrderPayment(userDetails, id).getClass());
     }
 }
