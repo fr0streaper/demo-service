@@ -7,7 +7,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 
 @Service
@@ -20,7 +20,7 @@ class DefaultDeliveryService(private val meterRegistry: MeterRegistry) : Deliver
             .description("Count of timeslot set requests")
 
     override fun getAvailableDeliverySlots(number: Int): List<LocalDateTime> {
-        return listOf<LocalDateTime>()
+        return listOf()
     }
 
     override fun setDesiredDeliveryTime(order_id: UUID, slot_in_sec: Int): BookingDto {
@@ -28,8 +28,7 @@ class DefaultDeliveryService(private val meterRegistry: MeterRegistry) : Deliver
 
         return BookingDto(
             id = UUID.randomUUID(),
-            failedItems = setOf(),
-            orderId = order_id
+            failedItems = setOf()
         )
     }
 }
