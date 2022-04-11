@@ -1,1 +1,2 @@
-alter table booking_log alter column timestamp type bigint;
+alter table booking_log drop column timestamp;
+alter table booking_log add column timestamp bigint not null default 0;
