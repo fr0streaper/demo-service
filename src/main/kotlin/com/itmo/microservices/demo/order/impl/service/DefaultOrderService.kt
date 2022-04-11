@@ -139,11 +139,11 @@ class DefaultOrderService(
             }
         }
 
-        log.info("Saving [${bookingLogEntities.size}] logs for booking with id [${bookingId}] for order with id [${orderId}]")
-        bookingLogRepository.saveAll(bookingLogEntities)
-
         log.info("Saving booking with id [${bookingId}] for order with id [${orderId}], failed to book [${failedBookingLogEntities.size}]")
         bookingRepository.save(bookingEntity)
+
+        log.info("Saving [${bookingLogEntities.size}] logs for booking with id [${bookingId}] for order with id [${orderId}]")
+        bookingLogRepository.saveAll(bookingLogEntities)
 
         log.info("Set booked status for order with id [${orderId}], finish booking")
         orderEntity.status = OrderStatusEnum.BOOKED
