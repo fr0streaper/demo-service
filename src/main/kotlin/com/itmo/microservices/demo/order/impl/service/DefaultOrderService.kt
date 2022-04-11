@@ -91,10 +91,14 @@ class DefaultOrderService(
         log.info("Item with item_id [$itemId] found")
 
         val orderEntity = orderRepository.getById(orderId)
-        val orderItemId = UUID.randomUUID()
-        val orderItemEntity = OrderItemDto(orderItemId, item.title, item.price).toEntity(amount, orderEntity, itemId)
+        val orderItemEntity = OrderItemDto(UUID.randomUUID(), item.title, item.price).toEntity(amount, orderEntity, itemId)
+        if (orderEntity.status == OrderStatusEnum.BOOKED) {
+            log.info("Changing status of order with id [${orderId}] from BOOKED to COLLECTING")
+            orderEntity.status = OrderStatusEnum.COLLECTING
+            orderRepository.save(orderEntity)
+        }
+        log.info("Saving order item with id [${orderItemEntity.id}] has [${orderItemEntity.amount}] amount for order [${orderId}]")
         orderItemRepository.save(orderItemEntity)
-        log.info("Saved: Order with id [${orderItemEntity.id}] has [${orderItemEntity.amount}] amount")
     }
 
     override fun bookOrder(orderId: UUID): BookingDto {
