@@ -9,7 +9,6 @@ import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.EnumType
 import javax.persistence.Enumerated
-import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
 import javax.persistence.OneToMany
@@ -33,7 +32,7 @@ class OrderEntity {
 
     var deliveryDuration: Int? = 0
 
-    @OneToMany(cascade = [(CascadeType.ALL)], fetch = FetchType.LAZY, mappedBy = "orderEntity")
+    @OneToMany(cascade = [CascadeType.ALL], mappedBy = "orderEntity")
     var itemsMap: List<OrderItemEntity>? = null
 
     @OneToMany

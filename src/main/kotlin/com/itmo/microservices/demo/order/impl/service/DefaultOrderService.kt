@@ -118,7 +118,7 @@ class DefaultOrderService(
                 bookingLogEntities.add(
                     BookingLogEntity(
                         UUID.randomUUID(),
-                        orderItemEntity.itemId,
+                        item.id,
                         BookingStatus.FAILED,
                         orderItemEntity.amount,
                         System.currentTimeMillis(),
@@ -129,7 +129,7 @@ class DefaultOrderService(
                 bookingLogEntities.add(
                     BookingLogEntity(
                         UUID.randomUUID(),
-                        orderItemEntity.itemId,
+                        item.id,
                         BookingStatus.SUCCESS,
                         orderItemEntity.amount,
                         System.currentTimeMillis(),
