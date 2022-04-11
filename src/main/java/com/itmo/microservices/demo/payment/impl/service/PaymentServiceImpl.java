@@ -75,30 +75,34 @@ public class PaymentServiceImpl implements PaymentService {
 
     //static final Counter revenue =
             //Counter.build().name("revenue_total").help("Total revenue").labelNames("serviceName").register();
-    private Counter.Builder revenue = Counter.builder("revenue_total").description("Total revenue");
+//    private Counter.Builder revenue = Counter.builder("revenue_total").description("Total revenue");
 
     @Override
     public PaymentSubmissionDto executeOrderPayment(UserDetails user, UUID orderId) {
-        Optional<OrderEntity> optionalOrderEntity = orderRepository.findById(orderId);
-        if (optionalOrderEntity.isEmpty()) {
-            log.info("Order with id [{}] was not found", orderId);
-            return null;
-        }
-        var itemsMap = optionalOrderEntity.get().getItemsMap();
-        Counter counter = revenue.tags("serviceName", "p03").register(meterRegistry);
-        if (itemsMap != null) {
-            itemsMap.forEach(item -> {
-                if (item.getPrice() == null) {
-                    log.info("Price of item with id [{}] is null", item.getId());
-                    return;
-                }
-                if (item.getAmount() == null) {
-                    log.info("Amount of item with id [{}] is null", item.getId());
-                    return;
-                }
-                counter.increment(item.getPrice() * item.getAmount());
-            });
-        }
+//        Optional<OrderEntity> optionalOrderEntity = orderRepository.findById(orderId);
+//        if (optionalOrderEntity.isEmpty()) {
+//            log.info("Order with id [{}] was not found", orderId);
+//            return null;
+//        }
+//        var itemsMap = optionalOrderEntity.get().getItemsMap();
+//        Counter counter = revenue.tags("serviceName", "p03").register(meterRegistry);
+//        if (itemsMap == null) {
+//            log.info("Order with id [{}] has 0 items. Nothing to pay for.", orderId);
+//            return null;
+//        }
+//        if (itemsMap != null) {
+//            itemsMap.forEach(item -> {
+//                if (item.getPrice() == null) {
+//                    log.info("Price of item with id [{}] is null", item.getId());
+//                    return;
+//                }
+//                if (item.getAmount() == null) {
+//                    log.info("Amount of item with id [{}] is null", item.getId());
+//                    return;
+//                }
+//                counter.increment(item.getPrice() * item.getAmount());
+//            });
+//        }
         return PaymentSubmissionDto.builder()
                 .timestamp(System.currentTimeMillis())
                 .transactionID(UUID.randomUUID()) //TODO:: query to order repo by orderId
