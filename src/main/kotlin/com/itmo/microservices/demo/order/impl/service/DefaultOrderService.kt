@@ -147,6 +147,7 @@ class DefaultOrderService(
 
         log.info("Set booked status for order with id [${orderId}], finish booking")
         orderEntity.status = OrderStatusEnum.BOOKED
+        orderRepository.save(orderEntity)
 
         return BookingDto(bookingId, failedBookingLogEntities)
     }

@@ -4,10 +4,12 @@ import com.itmo.microservices.demo.lib.common.order.dto.OrderStatusEnum
 import com.itmo.microservices.demo.payment.impl.model.PaymentLogRecordEntity
 import java.time.LocalDateTime
 import java.util.UUID
+import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.EnumType
 import javax.persistence.Enumerated
+import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
 import javax.persistence.OneToMany
@@ -31,7 +33,7 @@ class OrderEntity {
 
     var deliveryDuration: Int? = 0
 
-    @OneToMany
+    @OneToMany(cascade = [(CascadeType.ALL)], fetch = FetchType.LAZY, mappedBy = "orderEntity")
     var itemsMap: List<OrderItemEntity>? = null
 
     @OneToMany
