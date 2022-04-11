@@ -6,9 +6,8 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
+import kotlin.random.Random
 import java.util.UUID
-
 
 @Service
 class DefaultDeliveryService(private val meterRegistry: MeterRegistry) : DeliveryService {
@@ -19,8 +18,8 @@ class DefaultDeliveryService(private val meterRegistry: MeterRegistry) : Deliver
         Counter.builder("timeslot_set_request_count")
             .description("Count of timeslot set requests")
 
-    override fun getAvailableDeliverySlots(number: Int): List<LocalDateTime> {
-        return listOf()
+    override fun getAvailableDeliverySlots(number: Int): List<Int> {
+        return List(number) { Random.nextInt(0, 31) }
     }
 
     override fun setDesiredDeliveryTime(order_id: UUID, slot_in_sec: Int): BookingDto {

@@ -151,4 +151,20 @@ class DefaultOrderService(
 
         return BookingDto(bookingId, failedBookingLogEntities)
     }
+
+    override fun setDeliverySlot(orderId: UUID, slot: Int) {
+        log.info("Setting delivery slot for order with id [${orderId}]")
+        val orderEntityOptional = orderRepository.findById(orderId)
+        
+        if (orderEntityOptional.isEmpty) {
+            log.info("Order with id [${orderId}] was not found")
+            return
+        }
+
+        val orderEntity = orderEntityOptional.get()
+        orderEntity.deliveryDuration = slot
+
+        log.info("Saving order with [${orderId}] and delivery slot [${slot}]")
+        orderRepository.save(orderEntity)
+    }
 }

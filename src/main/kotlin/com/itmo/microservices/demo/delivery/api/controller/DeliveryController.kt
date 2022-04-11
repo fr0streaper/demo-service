@@ -26,7 +26,7 @@ class DeliveryController (private val deliveryService: DeliveryService) {
     )
     fun getAvailableDeliverySlots(
         @RequestParam("number") number: Int
-    ): List<LocalDateTime> = deliveryService.getAvailableDeliverySlots(number)
+    ): List<Int> = deliveryService.getAvailableDeliverySlots(number)
 
     @PostMapping("/{order_id}/time")
     @Operation(

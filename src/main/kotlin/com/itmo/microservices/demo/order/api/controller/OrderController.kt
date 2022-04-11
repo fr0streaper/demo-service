@@ -114,4 +114,20 @@ class OrderController(private val orderService: OrderService, private val paymen
         @AuthenticationPrincipal user: UserDetails,
         @PathVariable("order_id") orderId: UUID
     ): BookingDto = orderService.bookOrder(orderId)
+
+    @PostMapping("/{order_id}/delivery")
+    @Operation(
+        summary = "Set delivery slot",
+        responses = [
+            ApiResponse(description = "OK", responseCode = "200"),
+            ApiResponse(description = "Unauthorized", responseCode = "403", content = [Content()]),
+            ApiResponse(description = "Bad request", responseCode = "400", content = [Content()])
+        ],
+        security = [SecurityRequirement(name = "bearerAuth")]
+    )
+    fun setDeliverySlot(
+        @RequestParam slot: Int,
+        @AuthenticationPrincipal user: UserDetails,
+        @PathVariable("order_id") orderId: UUID
+    ) = orderService.setDeliverySlot(orderId, slot)
 }

@@ -11,4 +11,5 @@ interface OrderService {
     fun submitOrder(user: UserDetails, orderId: UUID): OrderDto
     fun addItemToBasket(itemId: UUID, orderId: UUID, amount: Int)
     fun bookOrder(orderId: UUID): BookingDto
+    fun setDeliverySlot(orderId: UUID, slot: Int)
 }
