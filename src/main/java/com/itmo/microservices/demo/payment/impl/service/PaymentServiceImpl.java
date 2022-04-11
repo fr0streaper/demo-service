@@ -1,7 +1,8 @@
 package com.itmo.microservices.demo.payment.impl.service;
 
-import com.itmo.microservices.demo.lib.common.order.entity.OrderItemEntity;
+import com.itmo.microservices.demo.lib.common.order.entity.OrderEntity;
 import com.itmo.microservices.demo.lib.common.order.repository.OrderItemRepository;
+import com.itmo.microservices.demo.lib.common.order.repository.OrderRepository;
 import com.itmo.microservices.demo.order.api.service.OrderService;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -36,6 +37,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final UserAccountFinancialLogRecordRepository userAccountFinancialLogRecordRepository;
     private final OrderItemRepository orderItemRepository;
+    private final OrderRepository orderRepository;
     private final OrderService orderService;
     private final UserService userService;
     private final MeterRegistry meterRegistry;
@@ -77,26 +79,28 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public PaymentSubmissionDto executeOrderPayment(UserDetails user, UUID orderId) {
-        var order = orderService.getOrder(orderId);
-        if (order != null) {
-            var itemsMap = order.getItemsMap();
-            Counter counter = revenue.tags("serviceName", "p03").register(meterRegistry);
-            if (itemsMap != null) {
-                itemsMap.forEach((orderItemUUID, items_count) -> {
-                    Optional<OrderItemEntity> orderItem = orderItemRepository.findById(orderItemUUID);
-                    if (orderItem.isEmpty()) {
-                        log.error("Order item with id [{}] was not found in DB", orderItemUUID);
-                    } else {
-                        var price = orderItem.get().getPrice();
-                        if (price != null)
-                            //revenue.labels(serviceName).inc(price * items_count);
-                            counter.increment(price * items_count);
-                    }
-                });
-            }
+        Optional<OrderEntity> optionalOrderEntity = orderRepository.findById(orderId);
+        if (optionalOrderEntity.isEmpty()) {
+            log.info("Order with id [{}] was not found", orderId);
+            return null;
+        }
+        var itemsMap = optionalOrderEntity.get().getItemsMap();
+        Counter counter = revenue.tags("serviceName", "p03").register(meterRegistry);
+        if (itemsMap != null) {
+            itemsMap.forEach(item -> {
+                if (item.getPrice() == null) {
+                    log.info("Price of item with id [{}] is null", item.getId());
+                    return;
+                }
+                if (item.getAmount() == null) {
+                    log.info("Amount of item with id [{}] is null", item.getId());
+                    return;
+                }
+                counter.increment(item.getPrice() * item.getAmount());
+            });
         }
         return PaymentSubmissionDto.builder()
-                .timestamp(LocalDateTime.now())
+                .timestamp(System.currentTimeMillis())
                 .transactionID(UUID.randomUUID()) //TODO:: query to order repo by orderId
                 .build();
     }

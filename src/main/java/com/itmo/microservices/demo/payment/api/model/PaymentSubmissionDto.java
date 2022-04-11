@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Builder
@@ -13,6 +12,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @Data
 public class PaymentSubmissionDto {
-    private LocalDateTime timestamp;
+    private Long timestamp;
     private UUID transactionID;
 }
