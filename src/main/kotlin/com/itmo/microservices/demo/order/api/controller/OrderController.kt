@@ -1,5 +1,6 @@
 package com.itmo.microservices.demo.order.api.controller
 
+import com.itmo.microservices.demo.lib.common.delivery.dto.BookingDto
 import com.itmo.microservices.demo.lib.common.order.dto.OrderDto
 import com.itmo.microservices.demo.order.api.service.OrderService
 import com.itmo.microservices.demo.payment.api.model.PaymentSubmissionDto
@@ -11,8 +12,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.web.bind.annotation.*
-import java.util.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 
 @RestController
 @RequestMapping("/orders")
@@ -71,10 +78,10 @@ class OrderController(private val orderService: OrderService, private val paymen
             security = [SecurityRequirement(name = "bearerAuth")]
     )
     fun addItemToBasket(
-            @PathVariable("item_id") itemId: UUID,
-            @PathVariable("order_id") orderId: UUID,
-            @RequestParam amount: Int,
-            @Parameter(hidden = true) @AuthenticationPrincipal requester: UserDetails
+        @PathVariable("item_id") itemId: UUID,
+        @PathVariable("order_id") orderId: UUID,
+        @RequestParam amount: Int,
+        @Parameter(hidden = true) @AuthenticationPrincipal requester: UserDetails
     ) = orderService.addItemToBasket(itemId, orderId, amount)
 
     @PostMapping("/{order_id}/payment")
@@ -92,4 +99,19 @@ class OrderController(private val orderService: OrderService, private val paymen
         @AuthenticationPrincipal user: UserDetails,
         @PathVariable order_id: UUID
     ): PaymentSubmissionDto = paymentService.executeOrderPayment(user, order_id)
+
+    @PostMapping("/{order_id}/bookings")
+    @Operation(
+        summary = "Book order",
+        responses = [
+            ApiResponse(description = "OK", responseCode = "200"),
+            ApiResponse(description = "Unauthorized", responseCode = "403", content = [Content()]),
+            ApiResponse(description = "Bad request", responseCode = "400", content = [Content()])
+        ],
+        security = [SecurityRequirement(name = "bearerAuth")]
+    )
+    fun bookOrder(
+        @AuthenticationPrincipal user: UserDetails,
+        @PathVariable("order_id") orderId: UUID
+    ): BookingDto = orderService.bookOrder(orderId)
 }

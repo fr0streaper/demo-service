@@ -1,6 +1,7 @@
 package com.itmo.microservices.demo.order.impl.service
 
 import com.itmo.microservices.demo.items.api.service.WarehouseService
+import com.itmo.microservices.demo.lib.common.delivery.dto.BookingDto
 import com.itmo.microservices.demo.lib.common.order.dto.OrderDto
 import com.itmo.microservices.demo.lib.common.order.dto.OrderItemDto
 import com.itmo.microservices.demo.lib.common.order.dto.OrderStatusEnum
@@ -10,7 +11,6 @@ import com.itmo.microservices.demo.lib.common.order.mapper.toEntity
 import com.itmo.microservices.demo.lib.common.order.repository.OrderItemRepository
 import com.itmo.microservices.demo.lib.common.order.mapper.toModel
 import com.itmo.microservices.demo.lib.common.order.repository.OrderRepository
-import com.itmo.microservices.demo.tasks.impl.messaging.TaskModuleEventListener
 import com.itmo.microservices.demo.users.api.service.UserService
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
@@ -87,5 +87,16 @@ class DefaultOrderService(
         val orderItemEntity = OrderItemDto(orderItemId, item.title, item.price).toEntity(amount, orderEntity, itemId)
         orderItemRepository.save(orderItemEntity)
         log.info("Saved: Order with id [${orderItemEntity.id}] has [${orderItemEntity.amount}] amount")
+    }
+
+    override fun bookOrder(orderId: UUID): BookingDto {
+        val orderEntity = orderRepository.findById(orderId)
+        return if (orderEntity.isEmpty) {
+            log.info("Order with id [${orderId}] was not found")
+            BookingDto(UUID.randomUUID(), emptySet())
+        } else {
+            log.info("Order with id [${orderId}] is booked")
+            BookingDto(UUID.randomUUID(), emptySet())
+        }
     }
 }
