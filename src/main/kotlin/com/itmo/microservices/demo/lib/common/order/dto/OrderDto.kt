@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.itmo.microservices.demo.payment.api.model.PaymentLogRecordDto
 import java.time.LocalDateTime
 import java.time.ZoneOffset
-import java.util.*
+import java.util.UUID
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class OrderDto(
@@ -13,4 +13,5 @@ data class OrderDto(
     var status: OrderStatusEnum = OrderStatusEnum.COLLECTING,
     var itemsMap: Map<UUID, Int>?,
     var deliveryDuration: Int?,
-    var paymentHistory: List<PaymentLogRecordDto>?)
+    var paymentHistory: List<PaymentLogRecordDto>?
+)

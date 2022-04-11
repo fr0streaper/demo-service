@@ -1,6 +1,8 @@
 package com.itmo.microservices.demo.order.service;
 
 import com.google.common.eventbus.EventBus;
+import com.itmo.microservices.demo.booking.BookingLogRepository;
+import com.itmo.microservices.demo.booking.BookingRepository;
 import com.itmo.microservices.demo.items.impl.service.DefaultWarehouseService;
 import com.itmo.microservices.demo.lib.common.items.entity.CatalogItemEntity;
 import com.itmo.microservices.demo.lib.common.items.repository.ItemRepository;
@@ -34,6 +36,9 @@ public class AddItemToTheCartTest {
 
     OrderItemRepository orderItemRepository;
     DefaultOrderService orderService;
+
+    BookingRepository bookingRepository;
+    BookingLogRepository bookingLogRepository;
 
     @BeforeEach
     public void setUp() {
@@ -79,7 +84,11 @@ public class AddItemToTheCartTest {
         var meterRegistry = new SimpleMeterRegistry();
 
         orderItemRepository = mock(OrderItemRepository.class);
-        orderService = new DefaultOrderService(orderRepository, orderItemRepository, itemService, userService, meterRegistry);
+
+        bookingRepository = mock(BookingRepository.class);
+        bookingLogRepository = mock(BookingLogRepository.class);
+
+        orderService = new DefaultOrderService(orderRepository, orderItemRepository, itemService, userService, meterRegistry, bookingRepository, bookingLogRepository);
     }
 
     @Test

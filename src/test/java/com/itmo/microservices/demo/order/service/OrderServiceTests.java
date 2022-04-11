@@ -1,6 +1,8 @@
 package com.itmo.microservices.demo.order.service;
 
 import com.google.common.eventbus.EventBus;
+import com.itmo.microservices.demo.booking.BookingLogRepository;
+import com.itmo.microservices.demo.booking.BookingRepository;
 import com.itmo.microservices.demo.items.impl.service.DefaultWarehouseService;
 import com.itmo.microservices.demo.lib.common.order.dto.OrderDto;
 import com.itmo.microservices.demo.lib.common.order.dto.OrderStatusEnum;
@@ -39,6 +41,10 @@ public class OrderServiceTests {
 	OrderService orderService;
 
 	OrderEntity orderEntity;
+
+	BookingRepository bookingRepository;
+
+	BookingLogRepository bookingLogRepository;
 
 	@BeforeEach
 	public void init() {
@@ -80,7 +86,10 @@ public class OrderServiceTests {
 
 		var meterRegistry = new SimpleMeterRegistry();
 
-		orderService = new DefaultOrderService(orderRepository, orderItemRepository, mock(DefaultWarehouseService.class), userService, meterRegistry);
+		bookingRepository = mock(BookingRepository.class);
+		bookingLogRepository = mock(BookingLogRepository.class);
+
+		orderService = new DefaultOrderService(orderRepository, orderItemRepository, mock(DefaultWarehouseService.class), userService, meterRegistry, bookingRepository, bookingLogRepository);
 	}
 
 	@Test

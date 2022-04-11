@@ -1,6 +1,8 @@
 package com.itmo.microservices.demo.order.impl.service;
 
 import com.google.common.eventbus.EventBus;
+import com.itmo.microservices.demo.booking.BookingLogRepository;
+import com.itmo.microservices.demo.booking.BookingRepository;
 import com.itmo.microservices.demo.items.impl.service.DefaultWarehouseService;
 import com.itmo.microservices.demo.lib.common.order.dto.OrderStatusEnum;
 import com.itmo.microservices.demo.lib.common.order.entity.OrderEntity;
@@ -19,7 +21,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,6 +36,8 @@ import static org.mockito.Mockito.when;
 public class GetOrderTest {
     OrderRepository orderRepository;
     OrderItemRepository orderItemRepository;
+    BookingRepository bookingRepository;
+    BookingLogRepository bookingLogRepository;
     OrderService orderService;
     OrderEntity orderEntity;
 
@@ -77,7 +84,11 @@ public class GetOrderTest {
 
         var meterRegistry = new SimpleMeterRegistry();
 
-        orderService = new DefaultOrderService(orderRepository, orderItemRepository, mock(DefaultWarehouseService.class), userService, meterRegistry);
+        bookingRepository = mock(BookingRepository.class);
+        bookingLogRepository = mock(BookingLogRepository.class);
+
+
+        orderService = new DefaultOrderService(orderRepository, orderItemRepository, mock(DefaultWarehouseService.class), userService, meterRegistry, bookingRepository, bookingLogRepository);
     }
 
     @Test

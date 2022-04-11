@@ -1,27 +1,33 @@
 package com.itmo.microservices.demo.order.impl.service
 
+import com.itmo.microservices.demo.booking.BookingEntity
+import com.itmo.microservices.demo.booking.BookingLogEntity
+import com.itmo.microservices.demo.booking.BookingLogRepository
+import com.itmo.microservices.demo.booking.BookingRepository
+import com.itmo.microservices.demo.booking.BookingStatus
 import com.itmo.microservices.demo.items.api.service.WarehouseService
 import com.itmo.microservices.demo.lib.common.delivery.dto.BookingDto
 import com.itmo.microservices.demo.lib.common.order.dto.OrderDto
 import com.itmo.microservices.demo.lib.common.order.dto.OrderItemDto
 import com.itmo.microservices.demo.lib.common.order.dto.OrderStatusEnum
-import com.itmo.microservices.demo.order.api.service.OrderService
 import com.itmo.microservices.demo.lib.common.order.entity.OrderEntity
 import com.itmo.microservices.demo.lib.common.order.mapper.toEntity
-import com.itmo.microservices.demo.lib.common.order.repository.OrderItemRepository
 import com.itmo.microservices.demo.lib.common.order.mapper.toModel
+import com.itmo.microservices.demo.lib.common.order.repository.OrderItemRepository
 import com.itmo.microservices.demo.lib.common.order.repository.OrderRepository
+import com.itmo.microservices.demo.order.api.service.OrderService
 import com.itmo.microservices.demo.users.api.service.UserService
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
+import org.junit.jupiter.api.fail
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
-import org.springframework.beans.factory.annotation.Value
-import java.util.*
 import org.webjars.NotFoundException
+import java.util.UUID
 
 @Service
 class DefaultOrderService(
@@ -29,7 +35,9 @@ class DefaultOrderService(
     private val orderItemRepository: OrderItemRepository,
     private val itemService: WarehouseService,
     private val userService: UserService,
-    private val meterRegistry: MeterRegistry
+    private val meterRegistry: MeterRegistry,
+    private val bookingRepository: BookingRepository,
+    private val bookingLogRepository: BookingLogRepository
     ): OrderService {
 
     companion object {
@@ -79,9 +87,9 @@ class DefaultOrderService(
         if (item == null) {
             log.info("Item with item_id [$itemId] not found")
             throw NotFoundException("Item with item_id $itemId not found")
-        } else {
-            log.info("Item with item_id [$itemId] found")
         }
+        log.info("Item with item_id [$itemId] found")
+
         val orderEntity = orderRepository.getById(orderId)
         val orderItemId = UUID.randomUUID()
         val orderItemEntity = OrderItemDto(orderItemId, item.title, item.price).toEntity(amount, orderEntity, itemId)
@@ -90,13 +98,56 @@ class DefaultOrderService(
     }
 
     override fun bookOrder(orderId: UUID): BookingDto {
-        val orderEntity = orderRepository.findById(orderId)
-        return if (orderEntity.isEmpty) {
+        val optionalOrderEntity = orderRepository.findById(orderId)
+        if (optionalOrderEntity.isEmpty) {
             log.info("Order with id [${orderId}] was not found")
-            BookingDto(UUID.randomUUID(), emptySet())
-        } else {
-            log.info("Order with id [${orderId}] is booked")
-            BookingDto(UUID.randomUUID(), emptySet())
+            return BookingDto(UUID.randomUUID(), emptySet())
         }
+
+        val orderEntity = optionalOrderEntity.get()
+        log.info("Start booking order with id [${orderId}]")
+
+        val bookingId = UUID.randomUUID()
+        val bookingEntity = BookingEntity(bookingId, orderEntity)
+        val bookingLogEntities: MutableList<BookingLogEntity> = mutableListOf()
+        val failedBookingLogEntities: MutableSet<UUID> = mutableSetOf()
+        orderEntity.itemsMap?.forEach { orderItemEntity ->
+            val item = itemService.getItem(orderItemEntity.itemId!!)
+            if (item!!.amount < orderItemEntity.amount!!) {
+                failedBookingLogEntities.add(item.id!!)
+                bookingLogEntities.add(
+                    BookingLogEntity(
+                        UUID.randomUUID(),
+                        orderItemEntity.itemId,
+                        BookingStatus.FAILED,
+                        orderItemEntity.amount,
+                        System.currentTimeMillis(),
+                        bookingEntity
+                    )
+                )
+            } else {
+                bookingLogEntities.add(
+                    BookingLogEntity(
+                        UUID.randomUUID(),
+                        orderItemEntity.itemId,
+                        BookingStatus.SUCCESS,
+                        orderItemEntity.amount,
+                        System.currentTimeMillis(),
+                        bookingEntity
+                    )
+                )
+            }
+        }
+
+        log.info("Saving [${bookingLogEntities.size}] logs for booking with id [${bookingId}] for order with id [${orderId}]")
+        bookingLogRepository.saveAll(bookingLogEntities)
+
+        log.info("Saving booking with id [${bookingId}] for order with id [${orderId}], failed to book [${failedBookingLogEntities.size}]")
+        bookingRepository.save(bookingEntity)
+
+        log.info("Set booked status for order with id [${orderId}], finish booking")
+        orderEntity.status = OrderStatusEnum.BOOKED
+
+        return BookingDto(bookingId, failedBookingLogEntities)
     }
 }

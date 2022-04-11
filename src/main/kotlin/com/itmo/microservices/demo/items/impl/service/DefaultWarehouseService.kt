@@ -30,7 +30,7 @@ class DefaultWarehouseService(private val itemRepository: ItemRepository,
         = itemRepository.findByIdOrNull(itemId)?.toModel();
 
     override fun addItem(catalogItemDto: CatalogItemDto) : CatalogItemDto {
-        var insertedEntity = itemRepository.save(catalogItemDto.toEntity());
+        val insertedEntity = itemRepository.save(catalogItemDto.toEntity());
 
         return insertedEntity.toModel();
     }
