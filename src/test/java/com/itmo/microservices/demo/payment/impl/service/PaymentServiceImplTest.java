@@ -1,14 +1,12 @@
 package com.itmo.microservices.demo.payment.impl.service;
 
-import com.itmo.microservices.demo.order.api.service.OrderService;
+import com.itmo.microservices.demo.lib.common.order.repository.OrderRepository;
 import com.itmo.microservices.demo.payment.api.model.FinancialOperationType;
-import com.itmo.microservices.demo.payment.api.model.PaymentSubmissionDto;
 import com.itmo.microservices.demo.payment.impl.model.UserAccountFinancialLogRecord;
 import com.itmo.microservices.demo.payment.impl.repository.UserAccountFinancialLogRecordRepository;
 import com.itmo.microservices.demo.users.api.exception.UserNotFoundException;
 import com.itmo.microservices.demo.users.api.service.UserService;
 import com.itmo.microservices.demo.users.impl.entity.AppUser;
-import com.itmo.microservices.demo.users.impl.repository.UserRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +17,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
+import java.util.ArrayList;
 
 import static org.mockito.Mockito.when;
 
@@ -38,7 +38,7 @@ public class PaymentServiceImplTest {
     private UserService userService;
 
     @Mock
-    private OrderService orderService;
+    private OrderRepository orderRepository;
 
     @Mock
     private UserDetails userDetails;
@@ -78,6 +78,6 @@ public class PaymentServiceImplTest {
 
     @Test
     public void executeOrderPaymentTest() {
-        Assert.assertEquals(PaymentSubmissionDto.class, paymentService.executeOrderPayment(userDetails, id).getClass());
+        Assert.assertNull(paymentService.executeOrderPayment(userDetails, id));
     }
 }
