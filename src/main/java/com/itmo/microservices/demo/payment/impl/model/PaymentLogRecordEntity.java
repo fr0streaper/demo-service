@@ -1,5 +1,6 @@
 package com.itmo.microservices.demo.payment.impl.model;
 
+import com.itmo.microservices.demo.lib.common.order.entity.OrderEntity;
 import com.itmo.microservices.demo.payment.api.model.PaymentStatus;
 
 import javax.persistence.Column;
@@ -8,6 +9,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.util.UUID;
 
@@ -25,6 +27,9 @@ public class PaymentLogRecordEntity {
 	private PaymentStatus type;
 	private Integer amount;
 	private Long timestamp;
+
+	@ManyToOne
+	private OrderEntity orderEntity;
 
 	public UUID getId() {
 		return id;
@@ -64,5 +69,13 @@ public class PaymentLogRecordEntity {
 
 	public void setTimestamp(Long timestamp) {
 		this.timestamp = timestamp;
+	}
+
+	public OrderEntity getOrderEntity() {
+		return orderEntity;
+	}
+
+	public void setOrderEntity(OrderEntity orderEntity) {
+		this.orderEntity = orderEntity;
 	}
 }

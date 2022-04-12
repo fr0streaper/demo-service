@@ -11,6 +11,7 @@ import com.itmo.microservices.demo.lib.common.order.repository.OrderItemReposito
 import com.itmo.microservices.demo.lib.common.order.repository.OrderRepository;
 import com.itmo.microservices.demo.order.api.service.OrderService;
 import com.itmo.microservices.demo.order.impl.service.DefaultOrderService;
+import com.itmo.microservices.demo.payment.impl.repository.PaymentLogRecordRepository;
 import com.itmo.microservices.demo.users.impl.entity.AppUser;
 import com.itmo.microservices.demo.users.impl.repository.UserRepository;
 import com.itmo.microservices.demo.users.impl.service.DefaultUserService;
@@ -45,6 +46,8 @@ public class OrderServiceTests {
 	BookingRepository bookingRepository;
 
 	BookingLogRepository bookingLogRepository;
+
+	PaymentLogRecordRepository paymentLogRecordRepository;
 
 	@BeforeEach
 	public void init() {
@@ -88,8 +91,9 @@ public class OrderServiceTests {
 
 		bookingRepository = mock(BookingRepository.class);
 		bookingLogRepository = mock(BookingLogRepository.class);
+		paymentLogRecordRepository = mock(PaymentLogRecordRepository.class);
 
-		orderService = new DefaultOrderService(orderRepository, orderItemRepository, mock(DefaultWarehouseService.class), userService, meterRegistry, bookingRepository, bookingLogRepository);
+		orderService = new DefaultOrderService(orderRepository, orderItemRepository, mock(DefaultWarehouseService.class), userService, meterRegistry, bookingRepository, bookingLogRepository, paymentLogRecordRepository);
 	}
 
 	@Test

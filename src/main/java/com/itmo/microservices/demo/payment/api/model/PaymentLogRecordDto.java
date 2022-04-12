@@ -8,15 +8,14 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
-//@AllArgsConstructor
 public class PaymentLogRecordDto {
     public UUID transactionId;
-    public LocalDateTime timestamp;
+    public Long timestamp;
     public PaymentStatus status;
     public Integer amount;
 
     public PaymentLogRecordDto(UUID _transactionId,
-                        LocalDateTime _timestamp,
+                        Long _timestamp,
                         PaymentStatus _status,
                         Integer _amount)
     {

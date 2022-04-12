@@ -16,10 +16,10 @@ import com.itmo.microservices.demo.lib.common.order.mapper.toModel
 import com.itmo.microservices.demo.lib.common.order.repository.OrderItemRepository
 import com.itmo.microservices.demo.lib.common.order.repository.OrderRepository
 import com.itmo.microservices.demo.order.api.service.OrderService
+import com.itmo.microservices.demo.payment.impl.repository.PaymentLogRecordRepository
 import com.itmo.microservices.demo.users.api.service.UserService
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
-import org.junit.jupiter.api.fail
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -37,7 +37,8 @@ class DefaultOrderService(
     private val userService: UserService,
     private val meterRegistry: MeterRegistry,
     private val bookingRepository: BookingRepository,
-    private val bookingLogRepository: BookingLogRepository
+    private val bookingLogRepository: BookingLogRepository,
+    private val paymentLogRecordRepository: PaymentLogRecordRepository
     ): OrderService {
 
     companion object {
@@ -57,7 +58,7 @@ class DefaultOrderService(
             throw NotFoundException("Order with Order ID $orderId not found")
         }
         log.info("Order with Order ID [${orderId}] found")
-        return optionalOrder.get().toModel(orderItemRepository)
+        return optionalOrder.get().toModel(orderItemRepository, paymentLogRecordRepository)
     }
 
     override fun createOrder(user: UserDetails): OrderDto {
@@ -71,14 +72,14 @@ class DefaultOrderService(
 
         orderCreatedCount.tag("serviceName", serviceName).register(meterRegistry).increment()
 
-        return orderRepository.save(orderEntity).toModel(orderItemRepository)
+        return orderRepository.save(orderEntity).toModel(orderItemRepository, paymentLogRecordRepository)
     }
 
     override fun submitOrder(user: UserDetails, orderId: UUID): OrderDto {
         val order = orderRepository.getById(orderId)
         // TODO add check delivery status from delivery service
         order.status = OrderStatusEnum.SHIPPING
-        return orderRepository.save(order).toModel(orderItemRepository)
+        return orderRepository.save(order).toModel(orderItemRepository, paymentLogRecordRepository)
     }
 
     override fun addItemToBasket(itemId: UUID, orderId: UUID, amount: Int) {
