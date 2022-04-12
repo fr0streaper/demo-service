@@ -25,7 +25,7 @@ import java.util.UUID;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings("UnstableApiUsage")
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class PaymentServiceImplTest {
 
     @InjectMocks
