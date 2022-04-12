@@ -17,7 +17,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -62,11 +61,10 @@ public class PaymentServiceImplTest {
                 .type(FinancialOperationType.REFUND)
                 .orderId(id)
                 .timestamp(System.currentTimeMillis())
-                .userId(user.getId())
                 .build();
         list.add(entity);
         when(repository.save(entity)).thenReturn(entity);
-        when(repository.findAllByUserIdAndOrderId(user.getId(), id)).thenReturn(list);
+        when(repository.findAllByOrderId(id)).thenReturn(list);
     }
 
     @Test

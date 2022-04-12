@@ -10,6 +10,5 @@ import java.util.UUID;
 @Repository
 public interface UserAccountFinancialLogRecordRepository extends JpaRepository<UserAccountFinancialLogRecord, UUID> {
 
-    List<UserAccountFinancialLogRecord> findAllByUserIdAndOrderId(UUID userId, UUID orderId);
-    List<UserAccountFinancialLogRecord> findAllByUserId(UUID userId);
+    List<UserAccountFinancialLogRecord> findAllByOrderId(UUID orderId);
 }

@@ -25,8 +25,6 @@ public final class UserAccountFinancialLogRecord {
     @Column(columnDefinition = "uuid", updatable = false)
     private UUID id;
     @Column(columnDefinition = "uuid")
-    private UUID userId;
-    @Column(columnDefinition = "uuid")
     private UUID orderId; //TODO:: replace with related  entity
     @Column(columnDefinition = "uuid")
     private UUID paymentTransactionId; //TODO:: replace with related entity

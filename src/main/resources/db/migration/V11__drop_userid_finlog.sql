@@ -1,0 +1,1 @@
+alter table user_account_financial_log_record drop column user_id;

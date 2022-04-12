@@ -63,19 +63,9 @@ public class PaymentServiceImpl implements PaymentService {
                     PaymentServiceConstants.PAYMENT_LOG_MARKER, name));
         }
 
-//        userAccountFinancialLogRecordRepository.save(
-//                UserAccountFinancialLogRecord.builder()
-//                        .paymentTransactionId(UUID.randomUUID())
-//                        .amount(1)
-//                        .type(FinancialOperationType.REFUND)
-//                        .orderId(orderId != null ? orderId : UUID.randomUUID())
-//                        .timestamp(LocalDateTime.now())
-//                        .userId(user.getId())
-//                        .build()
-//        ); // temporary just to test
         var list = orderId != null ?
-                userAccountFinancialLogRecordRepository.findAllByUserIdAndOrderId(user.getId(), orderId) :
-                userAccountFinancialLogRecordRepository.findAllByUserId(user.getId()); //TODO:: criteria API? @Query?
+                userAccountFinancialLogRecordRepository.findAllByOrderId(orderId) :
+                userAccountFinancialLogRecordRepository.findAll();
         log.info("Found [{}] items for user id [{}] and order id [{}]", list.size(), user.getId(), orderId);
         return list
                 .stream()
@@ -141,7 +131,6 @@ public class PaymentServiceImpl implements PaymentService {
                             .type(FinancialOperationType.WITHDRAW)
                             .orderId(orderId)
                             .timestamp(timestamp)
-                            .userId(Objects.requireNonNull(userService.getUser(user.getUsername())).getId())
                             .build()
             );
         }
