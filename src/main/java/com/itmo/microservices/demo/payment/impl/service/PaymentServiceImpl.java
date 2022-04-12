@@ -3,6 +3,7 @@ package com.itmo.microservices.demo.payment.impl.service;
 import com.itmo.microservices.demo.external.ExternalSystemService;
 import com.itmo.microservices.demo.external.TransactionResponse;
 import com.itmo.microservices.demo.external.TransactionStatus;
+import com.itmo.microservices.demo.lib.common.order.dto.OrderStatusEnum;
 import com.itmo.microservices.demo.lib.common.order.entity.OrderEntity;
 import com.itmo.microservices.demo.lib.common.order.repository.OrderItemRepository;
 import com.itmo.microservices.demo.lib.common.order.repository.OrderRepository;
@@ -87,7 +88,8 @@ public class PaymentServiceImpl implements PaymentService {
             log.info("Order with id [{}] was not found", orderId);
             return null;
         }
-        var itemsMap = optionalOrderEntity.get().getItemsMap();
+        OrderEntity orderEntity = optionalOrderEntity.get();
+        var itemsMap = orderEntity.getItemsMap();
 //        Counter counter = revenue.tags("serviceName", "p03").register(meterRegistry);
         if (itemsMap == null) {
             log.info("Order with id [{}] has 0 items. Nothing to pay for.", orderId);
@@ -119,6 +121,11 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         log.info("External system returned SUCCESS for order with id [{}]", orderId);
+
+        log.info("Setting status PAID for order with id [{}]", orderId);
+        orderEntity.setStatus(OrderStatusEnum.PAID);
+        orderRepository.save(orderEntity);
+
         return new PaymentSubmissionDto(System.currentTimeMillis(), transactionResponse.getId());
     }
 }
