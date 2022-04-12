@@ -76,7 +76,7 @@ public class PaymentServiceImpl implements PaymentService {
         var list = orderId != null ?
                 userAccountFinancialLogRecordRepository.findAllByUserIdAndOrderId(user.getId(), orderId) :
                 userAccountFinancialLogRecordRepository.findAllByUserId(user.getId()); //TODO:: criteria API? @Query?
-
+        log.info("Found [{}] items for user id [{}] and order if [{}]", list.size(), user.getId(), orderId);
         return list
                 .stream()
                 .map(UserAccountFinancialLogRecordUtils::entityToDto)
