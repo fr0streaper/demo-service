@@ -10,10 +10,13 @@ import com.itmo.microservices.demo.lib.common.order.repository.OrderRepository;
 import com.itmo.microservices.demo.order.api.service.OrderService;
 import com.itmo.microservices.demo.payment.PaymentServiceConstants;
 import com.itmo.microservices.demo.payment.api.model.FinancialOperationType;
+import com.itmo.microservices.demo.payment.api.model.PaymentStatus;
 import com.itmo.microservices.demo.payment.api.model.PaymentSubmissionDto;
 import com.itmo.microservices.demo.payment.api.model.UserAccountFinancialLogRecordDto;
 import com.itmo.microservices.demo.payment.api.service.PaymentService;
+import com.itmo.microservices.demo.payment.impl.model.PaymentLogRecordEntity;
 import com.itmo.microservices.demo.payment.impl.model.UserAccountFinancialLogRecord;
+import com.itmo.microservices.demo.payment.impl.repository.PaymentLogRecordRepository;
 import com.itmo.microservices.demo.payment.impl.repository.UserAccountFinancialLogRecordRepository;
 import com.itmo.microservices.demo.payment.utils.UserAccountFinancialLogRecordUtils;
 import com.itmo.microservices.demo.users.api.exception.UserNotFoundException;
@@ -27,6 +30,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,6 +45,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final UserAccountFinancialLogRecordRepository userAccountFinancialLogRecordRepository;
     private final OrderItemRepository orderItemRepository;
     private final OrderRepository orderRepository;
+    private final PaymentLogRecordRepository paymentLogRecordRepository;
     private final OrderService orderService;
     private final UserService userService;
     private final MeterRegistry meterRegistry;
@@ -111,21 +116,42 @@ public class PaymentServiceImpl implements PaymentService {
 
         log.info("Start request to external system for payment for order with id [{}]", orderId);
         TransactionResponse transactionResponse = externalSystemService.getPaymentTransactionResponse(sum.get());
+        PaymentStatus status;
+        UUID transactionId;
         if (transactionResponse == null) {
             log.info("External system returned NOT OK status for order with id [{}]", orderId);
-            return null;
-        }
-        if (transactionResponse.getStatus() != TransactionStatus.SUCCESS) {
+            status = PaymentStatus.FAILED;
+            transactionId = UUID.randomUUID();
+        } else if (transactionResponse.getStatus() != TransactionStatus.SUCCESS) {
             log.info("External system returned [{}] for order with id [{}]", transactionResponse.getStatus(), orderId);
-            return null;
+            status = PaymentStatus.FAILED;
+            transactionId = transactionResponse.getId();
+        } else {
+            status = PaymentStatus.SUCCESS;
+            transactionId = transactionResponse.getId();
         }
 
         log.info("External system returned SUCCESS for order with id [{}]", orderId);
 
         log.info("Setting status PAID for order with id [{}]", orderId);
         orderEntity.setStatus(OrderStatusEnum.PAID);
-        orderRepository.save(orderEntity);
+        List<PaymentLogRecordEntity> paymentHistory = orderEntity.getPaymentHistory();
+        if (paymentHistory == null) {
+            paymentHistory = new ArrayList<>();
+        }
+        Long timestamp = System.currentTimeMillis();
 
-        return new PaymentSubmissionDto(System.currentTimeMillis(), transactionResponse.getId());
+        PaymentLogRecordEntity paymentLogRecordEntity = new PaymentLogRecordEntity();
+        paymentLogRecordEntity.setAmount((int) sum.get());
+        paymentLogRecordEntity.setTimestamp(timestamp);
+        paymentLogRecordEntity.setType(status);
+
+        paymentHistory.add(paymentLogRecordEntity);
+        orderEntity.setPaymentHistory(paymentHistory);
+
+        orderRepository.save(orderEntity);
+        paymentLogRecordRepository.save(paymentLogRecordEntity);
+
+        return new PaymentSubmissionDto(timestamp, transactionId);
     }
 }

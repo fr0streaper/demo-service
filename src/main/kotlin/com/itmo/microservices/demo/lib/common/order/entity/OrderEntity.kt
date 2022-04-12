@@ -36,7 +36,7 @@ class OrderEntity {
     var itemsMap: List<OrderItemEntity>? = null
 
     @OneToMany
-    var paymentHistory: MutableList<PaymentLogRecordEntity>? = null
+    var paymentHistory: MutableList<PaymentLogRecordEntity>? = mutableListOf()
 
     constructor()
 
