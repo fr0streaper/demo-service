@@ -24,7 +24,7 @@ public class PaymentLogRecordEntity {
 	private UUID transactionId;
 
 	@Enumerated(EnumType.STRING)
-	private PaymentStatus type;
+	private PaymentStatus status;
 	private Integer amount;
 	private Long timestamp;
 
@@ -47,12 +47,12 @@ public class PaymentLogRecordEntity {
 		this.transactionId = transactionId;
 	}
 
-	public PaymentStatus getType() {
-		return type;
+	public PaymentStatus getStatus() {
+		return status;
 	}
 
-	public void setType(PaymentStatus type) {
-		this.type = type;
+	public void setStatus(PaymentStatus type) {
+		this.status = type;
 	}
 
 	public Integer getAmount() {

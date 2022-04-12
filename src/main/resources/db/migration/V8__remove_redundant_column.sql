@@ -1,0 +1,1 @@
+alter table payment_log_record drop column type;

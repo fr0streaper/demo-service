@@ -145,8 +145,9 @@ public class PaymentServiceImpl implements PaymentService {
         paymentLogRecordEntity.setId(UUID.randomUUID());
         paymentLogRecordEntity.setAmount((int) sum.get());
         paymentLogRecordEntity.setTimestamp(timestamp);
-        paymentLogRecordEntity.setType(status);
+        paymentLogRecordEntity.setStatus(status);
         paymentLogRecordEntity.setTransactionId(transactionId);
+        paymentLogRecordEntity.setOrderEntity(orderEntity);
 
         paymentHistory.add(paymentLogRecordEntity);
         orderEntity.setPaymentHistory(paymentHistory);

@@ -48,7 +48,7 @@ fun OrderEntity.getPaymentHistory(paymentLogRecordRepository: PaymentLogRecordRe
         PaymentLogRecordDto(
             paymentLogRecordEntity.transactionId,
             paymentLogRecordEntity.timestamp,
-            paymentLogRecordEntity.type,
+            paymentLogRecordEntity.status,
             paymentLogRecordEntity.amount
         )
     }
