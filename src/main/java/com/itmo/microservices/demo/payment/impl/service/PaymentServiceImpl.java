@@ -123,18 +123,18 @@ public class PaymentServiceImpl implements PaymentService {
             status = PaymentStatus.FAILED;
             transactionId = UUID.randomUUID();
         } else if (transactionResponse.getStatus() != TransactionStatus.SUCCESS) {
-            log.info("External system returned [{}] for order with id [{}]", transactionResponse.getStatus(), orderId);
             status = PaymentStatus.FAILED;
             transactionId = transactionResponse.getId();
         } else {
             status = PaymentStatus.SUCCESS;
             transactionId = transactionResponse.getId();
+            log.info("Setting status PAID for order with id [{}]", orderId);
+            orderEntity.setStatus(OrderStatusEnum.PAID);
         }
 
-        log.info("External system returned SUCCESS for order with id [{}]", orderId);
+        log.info("External system returned [{}] for order with id [{}]", status, orderId);
 
-        log.info("Setting status PAID for order with id [{}]", orderId);
-        orderEntity.setStatus(OrderStatusEnum.PAID);
+
         List<PaymentLogRecordEntity> paymentHistory = orderEntity.getPaymentHistory();
         if (paymentHistory == null) {
             paymentHistory = new ArrayList<>();
@@ -153,7 +153,6 @@ public class PaymentServiceImpl implements PaymentService {
         orderEntity.setPaymentHistory(paymentHistory);
 
         orderRepository.save(orderEntity);
-        paymentLogRecordRepository.save(paymentLogRecordEntity);
 
         return new PaymentSubmissionDto(timestamp, transactionId);
     }
