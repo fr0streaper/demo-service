@@ -61,7 +61,7 @@ public class PaymentServiceImplTest {
                 .amount(1)
                 .type(FinancialOperationType.REFUND)
                 .orderId(id)
-                .timestamp(LocalDateTime.now())
+                .timestamp(System.currentTimeMillis())
                 .userId(user.getId())
                 .build();
         list.add(entity);

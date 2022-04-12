@@ -17,5 +17,5 @@ public class UserAccountFinancialLogRecordDto {
     private Integer amount;
     private UUID orderId;
     private UUID paymentTransactionId;
-    private LocalDateTime timestamp;
+    private Long timestamp;
 }

@@ -34,7 +34,7 @@ public final class UserAccountFinancialLogRecord {
     @Enumerated(EnumType.STRING)
     private FinancialOperationType type;
     private Integer amount;
-    private LocalDateTime timestamp;
+    private Long timestamp;
 
     @Override
     public boolean equals(Object o) {

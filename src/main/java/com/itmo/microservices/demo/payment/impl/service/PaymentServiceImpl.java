@@ -119,6 +119,8 @@ public class PaymentServiceImpl implements PaymentService {
         TransactionResponse transactionResponse = externalSystemService.getPaymentTransactionResponse(sum.get());
         PaymentStatus status;
         UUID transactionId;
+        Long timestamp = System.currentTimeMillis();
+
         if (transactionResponse == null) {
             log.info("External system returned NOT OK status for order with id [{}]", orderId);
             status = PaymentStatus.FAILED;
@@ -138,7 +140,7 @@ public class PaymentServiceImpl implements PaymentService {
                             .amount((int) sum.get())
                             .type(FinancialOperationType.WITHDRAW)
                             .orderId(orderId)
-                            .timestamp(LocalDateTime.now())
+                            .timestamp(timestamp)
                             .userId(Objects.requireNonNull(userService.getUser(user.getUsername())).getId())
                             .build()
             );
@@ -151,7 +153,6 @@ public class PaymentServiceImpl implements PaymentService {
         if (paymentHistory == null) {
             paymentHistory = new ArrayList<>();
         }
-        Long timestamp = System.currentTimeMillis();
 
         PaymentLogRecordEntity paymentLogRecordEntity = new PaymentLogRecordEntity();
         paymentLogRecordEntity.setId(UUID.randomUUID());
