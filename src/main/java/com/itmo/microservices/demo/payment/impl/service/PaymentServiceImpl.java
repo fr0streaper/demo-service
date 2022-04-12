@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
@@ -62,20 +63,20 @@ public class PaymentServiceImpl implements PaymentService {
                     PaymentServiceConstants.PAYMENT_LOG_MARKER, name));
         }
 
-        userAccountFinancialLogRecordRepository.save(
-                UserAccountFinancialLogRecord.builder()
-                        .paymentTransactionId(UUID.randomUUID())
-                        .amount(1)
-                        .type(FinancialOperationType.REFUND)
-                        .orderId(orderId != null ? orderId : UUID.randomUUID())
-                        .timestamp(LocalDateTime.now())
-                        .userId(user.getId())
-                        .build()
-        ); // temporary just to test
-
+//        userAccountFinancialLogRecordRepository.save(
+//                UserAccountFinancialLogRecord.builder()
+//                        .paymentTransactionId(UUID.randomUUID())
+//                        .amount(1)
+//                        .type(FinancialOperationType.REFUND)
+//                        .orderId(orderId != null ? orderId : UUID.randomUUID())
+//                        .timestamp(LocalDateTime.now())
+//                        .userId(user.getId())
+//                        .build()
+//        ); // temporary just to test
         var list = orderId != null ?
                 userAccountFinancialLogRecordRepository.findAllByUserIdAndOrderId(user.getId(), orderId) :
                 userAccountFinancialLogRecordRepository.findAllByUserId(user.getId()); //TODO:: criteria API? @Query?
+
         return list
                 .stream()
                 .map(UserAccountFinancialLogRecordUtils::entityToDto)
@@ -130,6 +131,17 @@ public class PaymentServiceImpl implements PaymentService {
             transactionId = transactionResponse.getId();
             log.info("Setting status PAID for order with id [{}]", orderId);
             orderEntity.setStatus(OrderStatusEnum.PAID);
+
+            userAccountFinancialLogRecordRepository.save(
+                    UserAccountFinancialLogRecord.builder()
+                            .paymentTransactionId(transactionId)
+                            .amount((int) sum.get())
+                            .type(FinancialOperationType.WITHDRAW)
+                            .orderId(orderId)
+                            .timestamp(LocalDateTime.now())
+                            .userId(Objects.requireNonNull(userService.getUser(user.getUsername())).getId())
+                            .build()
+            );
         }
 
         log.info("External system returned [{}] for order with id [{}]", status, orderId);
