@@ -35,7 +35,7 @@ class OrderEntity {
     @OneToMany(cascade = [CascadeType.ALL], mappedBy = "orderEntity")
     var itemsMap: List<OrderItemEntity>? = null
 
-    @OneToMany
+    @OneToMany(cascade = [CascadeType.ALL], mappedBy = "orderEntity")
     var paymentHistory: MutableList<PaymentLogRecordEntity>? = mutableListOf()
 
     constructor()
