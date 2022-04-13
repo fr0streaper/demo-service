@@ -67,16 +67,17 @@ class DefaultOrderService(
         val orderEntity = optionalOrder.get()
         if (orderEntity.status == OrderStatusEnum.PAID) {
             val find =
-            paymentService.getFinlog(orderId).find { finlog -> finlog.type == FinancialOperationType.WITHDRAW }
+            paymentService.getFinlog(orderId).find { finlog -> finlog.getType() == FinancialOperationType.WITHDRAW }
             orderEntity.status = OrderStatusEnum.REFUND
             userAccountFinancialLogRecordRepository.save(
-                UserAccountFinancialLogRecord.builder()
-                    .paymentTransactionId(UUID.randomUUID())
-                    .amount(0)
-                    .type(FinancialOperationType.REFUND)
-                    .orderId(orderId)
-                    .timestamp(System.currentTimeMillis())
-                    .build()
+                UserAccountFinancialLogRecord(
+                    UUID.randomUUID(),
+                    orderId,
+                    UUID.randomUUID(),
+                    FinancialOperationType.REFUND,
+                    0,
+                    System.currentTimeMillis()
+                )
             )
             orderRepository.save(orderEntity)
             if (find == null) {

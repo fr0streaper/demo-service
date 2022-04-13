@@ -11,9 +11,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
 @ToString
@@ -45,5 +43,14 @@ public final class UserAccountFinancialLogRecord {
     @Override
     public int hashCode() {
         return 0;
+    }
+
+    public UserAccountFinancialLogRecord(UUID id, UUID orderId, UUID paymentTransactionId, FinancialOperationType type, Integer amount, Long timestamp) {
+        this.id = id;
+        this.orderId = orderId;
+        this.paymentTransactionId = paymentTransactionId;
+        this.type = type;
+        this.amount = amount;
+        this.timestamp = timestamp;
     }
 }

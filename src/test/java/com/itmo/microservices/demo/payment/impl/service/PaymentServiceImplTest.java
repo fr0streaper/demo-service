@@ -55,13 +55,12 @@ public class PaymentServiceImplTest {
     @Before
     public void setUp(){
         when(userService.getUser("name")).thenReturn(user);
-        UserAccountFinancialLogRecord entity = UserAccountFinancialLogRecord.builder()
-                .paymentTransactionId(UUID.randomUUID())
-                .amount(1)
-                .type(FinancialOperationType.REFUND)
-                .orderId(id)
-                .timestamp(System.currentTimeMillis())
-                .build();
+        UserAccountFinancialLogRecord entity = new UserAccountFinancialLogRecord();
+        entity.setPaymentTransactionId(UUID.randomUUID());
+        entity.setAmount(1);
+        entity.setType(FinancialOperationType.REFUND);
+        entity.setOrderId(id);
+        entity.setTimestamp(System.currentTimeMillis());
         list.add(entity);
         when(repository.save(entity)).thenReturn(entity);
         when(repository.findAllByOrderId(id)).thenReturn(list);

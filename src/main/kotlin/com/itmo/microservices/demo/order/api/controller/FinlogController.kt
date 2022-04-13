@@ -36,7 +36,7 @@ class FinlogController(private val paymentService: PaymentService) {
         @RequestParam(required = false) orderId: UUID?
     ): List<UserAccountFinancialLogRecordDto> {
         return try {
-            paymentService.getFinlog(user.username, orderId)
+            paymentService.getFinlog(orderId)
         } catch (e: UserNotFoundException) {
             throw NotFoundException(e)
         }

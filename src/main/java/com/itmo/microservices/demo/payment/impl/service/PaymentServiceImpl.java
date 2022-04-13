@@ -8,7 +8,6 @@ import com.itmo.microservices.demo.lib.common.order.entity.OrderEntity;
 import com.itmo.microservices.demo.lib.common.order.repository.OrderItemRepository;
 import com.itmo.microservices.demo.lib.common.order.repository.OrderRepository;
 import com.itmo.microservices.demo.order.api.service.OrderService;
-import com.itmo.microservices.demo.payment.PaymentServiceConstants;
 import com.itmo.microservices.demo.payment.api.model.FinancialOperationType;
 import com.itmo.microservices.demo.payment.api.model.PaymentStatus;
 import com.itmo.microservices.demo.payment.api.model.PaymentSubmissionDto;
@@ -19,7 +18,6 @@ import com.itmo.microservices.demo.payment.impl.model.UserAccountFinancialLogRec
 import com.itmo.microservices.demo.payment.impl.repository.PaymentLogRecordRepository;
 import com.itmo.microservices.demo.payment.impl.repository.UserAccountFinancialLogRecordRepository;
 import com.itmo.microservices.demo.payment.utils.UserAccountFinancialLogRecordUtils;
-import com.itmo.microservices.demo.users.api.exception.UserNotFoundException;
 import com.itmo.microservices.demo.users.api.service.UserService;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
@@ -29,10 +27,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
@@ -118,13 +114,7 @@ public class PaymentServiceImpl implements PaymentService {
             orderEntity.setStatus(OrderStatusEnum.PAID);
 
             userAccountFinancialLogRecordRepository.save(
-                    UserAccountFinancialLogRecord.builder()
-                            .paymentTransactionId(transactionId)
-                            .amount((int) sum.get())
-                            .type(FinancialOperationType.WITHDRAW)
-                            .orderId(orderId)
-                            .timestamp(timestamp)
-                            .build()
+                    new UserAccountFinancialLogRecord(UUID.randomUUID(), orderId, transactionId, FinancialOperationType.WITHDRAW, (int) sum.get(), timestamp)
             );
         }
 
