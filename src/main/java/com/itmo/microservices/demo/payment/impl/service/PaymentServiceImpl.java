@@ -5,9 +5,7 @@ import com.itmo.microservices.demo.external.TransactionResponse;
 import com.itmo.microservices.demo.external.TransactionStatus;
 import com.itmo.microservices.demo.lib.common.order.dto.OrderStatusEnum;
 import com.itmo.microservices.demo.lib.common.order.entity.OrderEntity;
-import com.itmo.microservices.demo.lib.common.order.repository.OrderItemRepository;
 import com.itmo.microservices.demo.lib.common.order.repository.OrderRepository;
-import com.itmo.microservices.demo.order.api.service.OrderService;
 import com.itmo.microservices.demo.payment.api.model.FinancialOperationType;
 import com.itmo.microservices.demo.payment.api.model.PaymentStatus;
 import com.itmo.microservices.demo.payment.api.model.PaymentSubmissionDto;
@@ -15,10 +13,8 @@ import com.itmo.microservices.demo.payment.api.model.UserAccountFinancialLogReco
 import com.itmo.microservices.demo.payment.api.service.PaymentService;
 import com.itmo.microservices.demo.payment.impl.model.PaymentLogRecordEntity;
 import com.itmo.microservices.demo.payment.impl.model.UserAccountFinancialLogRecord;
-import com.itmo.microservices.demo.payment.impl.repository.PaymentLogRecordRepository;
 import com.itmo.microservices.demo.payment.impl.repository.UserAccountFinancialLogRecordRepository;
 import com.itmo.microservices.demo.payment.utils.UserAccountFinancialLogRecordUtils;
-import com.itmo.microservices.demo.users.api.service.UserService;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -40,11 +36,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final Logger log = LoggerFactory.getLogger(PaymentServiceImpl.class);
 
     private final UserAccountFinancialLogRecordRepository userAccountFinancialLogRecordRepository;
-    private final OrderItemRepository orderItemRepository;
     private final OrderRepository orderRepository;
-    private final PaymentLogRecordRepository paymentLogRecordRepository;
-    private final OrderService orderService;
-    private final UserService userService;
     private final MeterRegistry meterRegistry;
     private final ExternalSystemService externalSystemService;
     @Value("#{environment['service.name']}")
