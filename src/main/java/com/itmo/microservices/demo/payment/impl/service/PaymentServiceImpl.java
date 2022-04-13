@@ -55,18 +55,11 @@ public class PaymentServiceImpl implements PaymentService {
     private String serviceName = "";
 
     @Override
-    public List<UserAccountFinancialLogRecordDto> getFinlog(String name, UUID orderId) throws UserNotFoundException {
-        var user = userService.getUser(name);
-
-        if (user == null) {
-            throw new UserNotFoundException(String.format("%s user with name: '%s' not found",
-                    PaymentServiceConstants.PAYMENT_LOG_MARKER, name));
-        }
-
+    public List<UserAccountFinancialLogRecordDto> getFinlog(UUID orderId) {
         var list = orderId != null ?
                 userAccountFinancialLogRecordRepository.findAllByOrderId(orderId) :
                 userAccountFinancialLogRecordRepository.findAll();
-        log.info("Found [{}] items for user id [{}] and order id [{}]", list.size(), user.getId(), orderId);
+        log.info("Found [{}] items for order id [{}]", list.size(), orderId);
         return list
                 .stream()
                 .map(UserAccountFinancialLogRecordUtils::entityToDto)

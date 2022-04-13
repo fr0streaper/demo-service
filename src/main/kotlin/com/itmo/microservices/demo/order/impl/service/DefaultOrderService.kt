@@ -16,7 +16,11 @@ import com.itmo.microservices.demo.lib.common.order.mapper.toModel
 import com.itmo.microservices.demo.lib.common.order.repository.OrderItemRepository
 import com.itmo.microservices.demo.lib.common.order.repository.OrderRepository
 import com.itmo.microservices.demo.order.api.service.OrderService
+import com.itmo.microservices.demo.payment.api.model.FinancialOperationType
+import com.itmo.microservices.demo.payment.api.service.PaymentService
+import com.itmo.microservices.demo.payment.impl.model.UserAccountFinancialLogRecord
 import com.itmo.microservices.demo.payment.impl.repository.PaymentLogRecordRepository
+import com.itmo.microservices.demo.payment.impl.repository.UserAccountFinancialLogRecordRepository
 import com.itmo.microservices.demo.users.api.service.UserService
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
@@ -27,7 +31,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import org.webjars.NotFoundException
-import java.util.UUID
+import java.util.*
 
 @Service
 class DefaultOrderService(
@@ -38,7 +42,9 @@ class DefaultOrderService(
     private val meterRegistry: MeterRegistry,
     private val bookingRepository: BookingRepository,
     private val bookingLogRepository: BookingLogRepository,
-    private val paymentLogRecordRepository: PaymentLogRecordRepository
+    private val paymentLogRecordRepository: PaymentLogRecordRepository,
+    private val paymentService: PaymentService,
+    private val userAccountFinancialLogRecordRepository: UserAccountFinancialLogRecordRepository
     ): OrderService {
 
     companion object {
@@ -58,7 +64,27 @@ class DefaultOrderService(
             throw NotFoundException("Order with Order ID $orderId not found")
         }
         log.info("Order with Order ID [${orderId}] found")
-        return optionalOrder.get().toModel(orderItemRepository, paymentLogRecordRepository)
+        val orderEntity = optionalOrder.get()
+        if (orderEntity.status == OrderStatusEnum.PAID) {
+            val find =
+            paymentService.getFinlog(orderId).find { finlog -> finlog.type == FinancialOperationType.WITHDRAW }
+            orderEntity.status = OrderStatusEnum.REFUND
+            userAccountFinancialLogRecordRepository.save(
+                UserAccountFinancialLogRecord.builder()
+                    .paymentTransactionId(UUID.randomUUID())
+                    .amount(0)
+                    .type(FinancialOperationType.REFUND)
+                    .orderId(orderId)
+                    .timestamp(System.currentTimeMillis())
+                    .build()
+            )
+            orderRepository.save(orderEntity)
+            if (find == null) {
+                throw NotFoundException("For order with Order ID $orderId withdrawal operations not found")
+            }
+
+        }
+        return orderEntity.toModel(orderItemRepository, paymentLogRecordRepository)
     }
 
     override fun createOrder(user: UserDetails): OrderDto {

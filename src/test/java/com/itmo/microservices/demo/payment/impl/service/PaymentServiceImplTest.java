@@ -69,10 +69,10 @@ public class PaymentServiceImplTest {
 
     @Test
     public void getFinlogTest() throws UserNotFoundException {
-        Assert.assertEquals(list.get(0).getPaymentTransactionId(), paymentService.getFinlog("name", id).get(0).getPaymentTransactionId());
-        Assert.assertEquals(list.get(0).getOrderId(), paymentService.getFinlog("name", id).get(0).getOrderId());
-        Assert.assertEquals(list.get(0).getAmount(), paymentService.getFinlog("name", id).get(0).getAmount());
-        Assert.assertEquals(list.get(0).getTimestamp(), paymentService.getFinlog("name", id).get(0).getTimestamp());
+        Assert.assertEquals(list.get(0).getPaymentTransactionId(), paymentService.getFinlog(id).get(0).getPaymentTransactionId());
+        Assert.assertEquals(list.get(0).getOrderId(), paymentService.getFinlog(id).get(0).getOrderId());
+        Assert.assertEquals(list.get(0).getAmount(), paymentService.getFinlog(id).get(0).getAmount());
+        Assert.assertEquals(list.get(0).getTimestamp(), paymentService.getFinlog(id).get(0).getTimestamp());
     }
 
     @Test
