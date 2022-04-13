@@ -106,7 +106,13 @@ public class PaymentServiceImpl implements PaymentService {
             orderEntity.setStatus(OrderStatusEnum.PAID);
 
             userAccountFinancialLogRecordRepository.save(
-                    new UserAccountFinancialLogRecord(UUID.randomUUID(), orderId, transactionId, FinancialOperationType.WITHDRAW, (int) sum.get(), timestamp)
+                    UserAccountFinancialLogRecord.builder()
+                            .paymentTransactionId(transactionId)
+                            .amount((int) sum.get())
+                            .type(FinancialOperationType.WITHDRAW)
+                            .orderId(orderId)
+                            .timestamp(timestamp)
+                            .build()
             );
         }
 
